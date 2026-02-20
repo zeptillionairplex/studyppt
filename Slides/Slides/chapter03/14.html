@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - TipTap JSON Structure</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            flex: 1;
+            gap: 0;
+            position: relative;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Panels */
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid;
+        }
+
+        .panel-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 20px;
+            overflow: hidden;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* Left Panel (JSON) */
+        .panel-left {
+            background-color: #1e293b;
+            /* Slate 800 */
+        }
+
+        .panel-left .panel-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            border-bottom-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .panel-left .panel-body {
+            color: #e2e8f0;
+        }
+
+        /* Right Panel (SQL) */
+        .panel-right {
+            background-color: #f8fafc;
+            /* Slate 50 */
+        }
+
+        .panel-right .panel-header {
+            background-color: #e2e8f0;
+            /* Slate 200 */
+            border-bottom-color: #cbd5e1;
+            color: #334155;
+        }
+
+        .panel-right .panel-body {
+            color: #334155;
+        }
+
+        /* Syntax Highlighting */
+        .json-key {
+            color: #93c5fd;
+        }
+
+        /* blue-300 */
+        .json-str {
+            color: #86efac;
+        }
+
+        /* green-300 */
+        .json-num {
+            color: #fca5a5;
+        }
+
+        /* red-300 */
+        .json-bool {
+            color: #d8b4fe;
+        }
+
+        /* purple-300 */
+
+        .sql-kwd {
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        /* blue-600 */
+        .sql-func {
+            color: #7c3aed;
+        }
+
+        /* violet-600 */
+        .sql-str {
+            color: #059669;
+        }
+
+        /* emerald-600 */
+        .sql-op {
+            color: #dc2626;
+        }
+
+        /* red-600 */
+        .sql-cmt {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* slate-400 */
+
+        /* Connector Area */
+        .connector-area {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .connector-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+
+        /* Highlighting Specific Lines */
+        .highlight-box {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+        }
+
+        .highlight-json {
+            top: 195px;
+            left: 15px;
+            width: 90%;
+            height: 240px;
+            border-color: #f59e0b;
+            /* amber-500 */
+        }
+
+        .highlight-sql {
+            top: 250px;
+            left: 15px;
+            width: 92%;
+            height: 130px;
+            border-color: #f59e0b;
+            /* amber-500 */
+            background-color: rgba(245, 158, 11, 0.05);
+        }
+
+        /* Annotation Labels */
+        .annotation-label {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .label-json {
+            top: -12px;
+            right: 10px;
+            background-color: #f59e0b;
+            color: #0f172a;
+        }
+
+        .label-sql {
+            top: -12px;
+            right: 10px;
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        /* SVG Arrow */
+        .svg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .info-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .bg-json {
+            background-color: #334155;
+            color: #93c5fd;
+        }
+
+        .bg-sql {
+            background-color: #e2e8f0;
+            color: #2563eb;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">TipTap JSON 구조 — Single Source of Truth</h1>
+                <p class="subtitle">에디터의 데이터 구조가 데이터베이스 쿼리로 이어지는 과정</p>
+            </div>
+            <div class="text-right">
+                <div class="info-pill bg-json"><i class="fas fa-code mr-2"></i>Frontend (JSON)</div>
+                <div class="info-pill bg-sql"><i class="fas fa-database mr-2"></i>Backend (PostgreSQL)</div>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="content-area">
+            <!-- Left Panel: JSON -->
+            <div class="panel panel-left">
+                <div class="panel-header">
+                    <i class="fab fa-js text-yellow-400 text-xl"></i>
+                    <span class="panel-title">Editor State (JSON)</span>
+                </div>
+                <div class="panel-body">
+                    <!-- JSON Highlight Box -->
+                    <div class="highlight-box highlight-json">
+                        <div class="annotation-label label-json">Multi-Mark Tagging</div>
+                    </div>
+                    <div>{</div>
+                    <div class="pl-4"><span class="json-key">"type"</span>: <span class="json-str">"text"</span>,</div>
+                    <div class="pl-4"><span class="json-key">"text"</span>: <span class="json-str">"포도당"</span>,</div>
+                    <div class="pl-4"><span class="json-key">"marks"</span>: [</div>
+                    <!-- Mark 1: blankTarget -->
+                    <div class="pl-8">{</div>
+                    <div class="pl-12"><span class="json-key">"type"</span>: <span
+                            class="json-str">"blankTarget"</span>,</div>
+                    <div class="pl-12"><span class="json-key">"attrs"</span>: {</div>
+                    <div class="pl-16"><span class="json-key">"id"</span>: <span class="json-str">"bt-002"</span>,</div>
+                    <div class="pl-16"><span class="json-key">"difficulty"</span>: <span
+                            class="json-str">"medium"</span>,</div>
+                    <div class="pl-16"><span class="json-key">"hint"</span>: <span class="json-str">"탄수화물의 일종"</span>
+                    </div>
+                    <div class="pl-12">}</div>
+                    <div class="pl-8">},</div>
+                    <!-- Mark 2: keyConcept -->
+                    <div class="pl-8">{</div>
+                    <div class="pl-12"><span class="json-key">"type"</span>: <span class="json-str">"keyConcept"</span>,
+                    </div>
+                    <div class="pl-12"><span class="json-key">"attrs"</span>: {</div>
+                    <div class="pl-16"><span class="json-key">"id"</span>: <span class="json-str">"kc-001"</span>,</div>
+                    <div class="pl-16"><span class="json-key">"type"</span>: <span class="json-str">"term"</span></div>
+                    <div class="pl-12">}</div>
+                    <div class="pl-8">}</div>
+                    <div class="pl-4">]</div>
+                    <div>}</div>
+                </div>
+            </div>
+            <!-- Connector Visual -->
+            <div class="connector-area">
+                <div class="connector-circle">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+            <!-- Right Panel: SQL -->
+            <div class="panel panel-right">
+                <div class="panel-header">
+                    <i class="fas fa-database text-blue-600 text-xl"></i>
+                    <span class="panel-title">Extraction Query (SQL)</span>
+                </div>
+                <div class="panel-body">
+                    <!-- SQL Highlight Box -->
+                    <div class="highlight-box highlight-sql">
+                        <div class="annotation-label label-sql">Recursive Extraction</div>
+                    </div>
+                    <div class="sql-cmt">-- "빈칸"으로 지정된 모든 텍스트와 힌트 추출</div>
+                    <div><span class="sql-kwd">SELECT</span></div>
+                    <div class="pl-4">elem<span class="sql-op">-&gt;&gt;</span><span class="sql-str">'text'</span> <span
+                            class="sql-kwd">AS</span> text_content,</div>
+                    <div class="pl-4">mark<span class="sql-op">-&gt;</span><span class="sql-str">'attrs'</span><span
+                            class="sql-op">-&gt;&gt;</span><span class="sql-str">'hint'</span> <span
+                            class="sql-kwd">AS</span> hint_text</div>
+                    <div><span class="sql-kwd">FROM</span></div>
+                    <div class="pl-4">document_versions,</div>
+                    <div class="sql-cmt pl-4">-- 1. 문단(paragraph) 배열 해체</div>
+                    <div class="pl-4"><span class="sql-func">jsonb_array_elements</span>(content<span
+                            class="sql-op">-&gt;</span><span class="sql-str">'content'</span>) <span
+                            class="sql-kwd">AS</span> para,</div>
+                    <div class="sql-cmt pl-4">-- 2. 텍스트 노드 배열 해체</div>
+                    <div class="pl-4"><span class="sql-func">jsonb_array_elements</span>(para<span
+                            class="sql-op">-&gt;</span><span class="sql-str">'content'</span>) <span
+                            class="sql-kwd">AS</span> elem,</div>
+                    <div class="sql-cmt pl-4">-- 3. Marks 배열 해체 (핵심!)</div>
+                    <div class="pl-4"><span class="sql-func">jsonb_array_elements</span>(elem<span
+                            class="sql-op">-&gt;</span><span class="sql-str">'marks'</span>) <span
+                            class="sql-kwd">AS</span> mark</div>
+                    <div><span class="sql-kwd">WHERE</span></div>
+                    <div class="pl-4">mark<span class="sql-op">-&gt;&gt;</span><span class="sql-str">'type'</span> <span
+                            class="sql-op">=</span> <span class="sql-str">'blankTarget'</span>;</div>
+                </div>
+            </div>
+        </div>
+        <!-- SVG Arrows Overlay -->
+        <svg class="svg-overlay">
+            <defs>
+                <marker id="arrowhead" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+                    <polygon fill="#f59e0b" points="0 0, 10 3.5, 0 7"></polygon>
+                </marker>
+            </defs>
+            <!-- Curved line from JSON to SQL -->
+            <path d="M 580 320 C 640 320, 640 400, 700 360" fill="none" marker-end="url(#arrowhead)" stroke="#f59e0b"
+                stroke-dasharray="5,5" stroke-width="2"></path>
+        </svg>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - isomorphic-git 백업 활용</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #6366f1;
+            /* Indigo for Backup/Infra feel */
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #312e81;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 120px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 200px;
+        }
+
+        .step-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .icon-db {
+            background-color: #3b82f6;
+        }
+
+        /* Blue */
+        .icon-git {
+            background-color: #f97316;
+        }
+
+        /* Orange */
+        .icon-cloud {
+            background-color: #1e293b;
+        }
+
+        /* Slate/Black */
+
+        .step-title {
+            font-weight: 800;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -20px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 2. Strategy Matrix (Table Area) */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            padding: 10px 20px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 10px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-main {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .badge-sub {
+            background-color: #ffedd5;
+            color: #9a3412;
+            border: 1px solid #fed7aa;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .tag-fs {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .type {
+            color: #e5c07b;
+        }
+
+        .path {
+            color: #56b6c2;
+        }
+
+        .cmd {
+            color: #98c379;
+            font-weight: bold;
+        }
+
+        .highlight-line {
+            background-color: rgba(99, 102, 241, 0.15);
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #6366f1;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">isomorphic-git 백업 활용 — 재해 복구용 보험</h1>
+                <p class="subtitle">PostgreSQL을 메인 저장소로 사용하고, Git은 순수 백업 용도로 이중화</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-bold shadow-sm">
+                    <i class="fas fa-shield-alt mr-2"></i> Disaster Recovery
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Architecture Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-sitemap text-blue-500"></i> BACKUP ARCHITECTURE
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-db">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="step-title">PostgreSQL</div>
+                        <div class="step-desc">Primary Storage (Main)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">1. JSON Dump (Local)</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-git">
+                            <i class="fab fa-git-alt"></i>
+                        </div>
+                        <div class="step-title">isomorphic-git</div>
+                        <div class="step-desc">Local Git Repo (Server)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">2. Push (Batch/Async)</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-cloud">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div class="step-title">GitHub Private</div>
+                        <div class="step-desc">Off-site Backup</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Strategy Matrix -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-tasks text-indigo-600"></i> STORAGE STRATEGY MATRIX
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">구분 (Criteria)</th>
+                                <th style="width: 40%">메인 저장소 (PostgreSQL)</th>
+                                <th style="width: 40%">백업 저장소 (isomorphic-git)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>핵심 역할</strong></td>
+                                <td><span class="role-badge badge-main">실시간 서비스 운영</span></td>
+                                <td><span class="role-badge badge-sub">재해 복구 (DR)</span> &amp; 마이그레이션</td>
+                            </tr>
+                            <tr>
+                                <td><strong>저장 방식</strong></td>
+                                <td>관계형 테이블 (document_versions)</td>
+                                <td>JSON 파일 (.json) + Git History</td>
+                            </tr>
+                            <tr>
+                                <td><strong>장점</strong></td>
+                                <td>강력한 SQL 쿼리, 인덱싱, 고성능 Join</td>
+                                <td>플랫폼 독립적, 개발자 친화적 포맷, 이력 가시성</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Implementation Code -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-orange-500"></i> BACKUP IMPLEMENTATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: TypeScript Function -->
+                    <div class="code-panel" style="flex: 3;">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> lib/git-backup.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">import</span> git <span class="kwd">from</span> <span
+                                class="str">'isomorphic-git'</span>
+                            <span class="kwd">import</span> fs <span class="kwd">from</span> <span
+                                class="str">'fs'</span>
+                            <span class="kwd">const</span> BACKUP_DIR = <span class="str">'/data/git-backup'</span>
+                            <span class="kwd">export async function</span> <span class="func">backupToGit</span>(
+                            docId: <span class="type">string</span>, content: <span class="type">any</span>, author:
+                            <span class="type">string</span>, msg: <span class="type">string</span>
+                            ) {
+                            <span class="kwd">const</span> filepath = <span class="str">`documents/${docId}.json`</span>
+                            <span class="cmt">// 1. 파일 시스템에 JSON 쓰기 (PostgreSQL 저장 후 실행)</span>
+                            <span class="kwd">await</span> fs.promises.<span class="func">writeFile</span>(
+                            <span class="str">`${BACKUP_DIR}/${filepath}`</span>,
+                            <span class="prop">JSON</span>.<span class="func">stringify</span>(content, <span
+                                class="kwd">null</span>, 2)
+                            )
+
+                            <span class="cmt">// 2. 로컬 Git 커밋 (isomorphic-git 사용)</span>
+                            <span class="kwd">await</span> git.<span class="func">add</span>({ fs, dir: BACKUP_DIR,
+                            filepath })
+                            <span class="highlight-line"><span class="kwd">await</span> git.<span
+                                    class="func">commit</span>({</span>
+                            fs, dir: BACKUP_DIR,
+                            <span class="prop">message</span>: <span class="str">`[${docId}] ${msg}`</span>,
+                            <span class="prop">author</span>: { name: author, email: <span
+                                class="str">`${author}@edu.kr`</span> }
+                            })
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: File Structure Visual -->
+                    <div class="code-panel" style="flex: 2;">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-folder-open text-yellow-400"></i> Server File System
+                            </div>
+                            <span class="lang-tag tag-fs">FS</span>
+                        </div>
+                        <div class="code-body"><span class="path">/data/git-backup/</span>
+                            ├── <span class="path">.git/</span> <span class="cmt"># Git Repository Metadata</span>
+                            │ ├── HEAD
+                            │ ├── config
+                            │ └── objects/
+                            │
+                            └── <span class="path">documents/</span> <span class="cmt"># Actual JSON Files</span>
+                            ├── <span class="str">doc-uuid-001.json</span>
+                            ├── <span class="str">doc-uuid-002.json</span>
+                            └── <span class="str">doc-uuid-003.json</span>
+                            <span class="cmt"># Periodic Batch Job (Cron)</span>
+                            <span class="cmd">$ git push origin main</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

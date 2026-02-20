@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 교육과정 변경 알림</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #f59e0b;
+            /* Orange for alert/warning theme */
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 120px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 180px;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-admin {
+            background-color: #ef4444;
+        }
+
+        .icon-logic {
+            background-color: #f59e0b;
+        }
+
+        .icon-alert {
+            background-color: #3b82f6;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 5px;
+        }
+
+        /* 2. Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #fff7ed;
+            /* Light orange bg */
+            color: #9a3412;
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 2px solid #fed7aa;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag-core {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .tag-map {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+
+        .tag-alert {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .visual-panel {
+            flex: 1;
+            background-color: white;
+            /* Visual UI panel has light bg */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .visual-header {
+            background-color: #f8fafc;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .visual-label {
+            color: #475569;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-sql {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .tag-ui {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        .visual-body {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8fafc;
+        }
+
+        /* Syntax Highlight */
+        .sql-kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .sql-str {
+            color: #98c379;
+        }
+
+        .sql-op {
+            color: #61afef;
+        }
+
+        .sql-cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .highlight-line {
+            background-color: rgba(245, 158, 11, 0.15);
+            /* Orange highlight */
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #f59e0b;
+        }
+
+        /* Banner UI */
+        .alert-banner {
+            width: 100%;
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            color: #f59e0b;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .alert-content h4 {
+            margin: 0 0 4px 0;
+            color: #92400e;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .alert-content p {
+            margin: 0 0 10px 0;
+            color: #b45309;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .alert-action {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f59e0b;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+
+        .alert-link {
+            display: inline-flex;
+            align-items: center;
+            color: #d97706;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 12px;
+            text-decoration: underline;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">[D] 교육과정 변경 알림 — 영향 콘텐츠 자동 추적</h1>
+                <p class="subtitle">교육과정이 바뀌면 내 문제도 옛날 것이 된다? — 자동 감지 및 알림 시스템</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Curriculum Sync
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-random text-blue-500"></i> AUTOMATION FLOW
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-admin">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="step-title">Admin Registration</div>
+                        <div class="step-desc">변경 사항 등록 (Admin)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Background Job</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-logic">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                        <div class="step-title">Impact Analysis</div>
+                        <div class="step-desc">JOIN 쿼리로 영향 탐지</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Push / Email</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-alert">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="step-title">Notification</div>
+                        <div class="step-desc">교사 알림 및 배너 표시</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Sample -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-database text-green-600"></i> CORE TABLES FOR TRACKING
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%">Table Name</th>
+                                <th style="width: 50%">Description</th>
+                                <th style="width: 25%">Key Columns</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag-badge tag-core">curriculum</span></td>
+                                <td>교육과정 계층 구조 (트리 형태)</td>
+                                <td>id, name, parent_id</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-alert">curriculum_changes</span></td>
+                                <td>개정 사항 공지 및 적용 일자</td>
+                                <td>curriculum_id, description</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-map">doc_curriculum_map</span></td>
+                                <td>문서와 교육과정 단원 간의 매핑 정보</td>
+                                <td>document_id, curriculum_id</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-alert">notifications</span></td>
+                                <td>영향 받는 문서 소유자에게 발송된 알림</td>
+                                <td>user_id, type, is_read</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Implementation Area -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> LOGIC &amp; UX
+                </div>
+                <div class="code-container">
+                    <!-- Left: SQL Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-database text-blue-400"></i> findAffectedDocs.sql
+                            </div>
+                            <span class="lang-tag tag-sql">SQL</span>
+                        </div>
+                        <div class="code-body"><span class="sql-cmt">-- 1. 변경된 단원(curriculum_id)에 연결된 모든 문서를 찾음</span>
+                            <span class="sql-kwd">SELECT</span>
+                            d.id, d.title, d.owner_id, c.description
+                            <span class="sql-kwd">FROM</span> documents d
+                            <span class="highlight-line"><span class="sql-kwd">JOIN</span> document_curriculum_map m
+                                <span class="sql-kwd">ON</span> d.id <span class="sql-op">=</span> m.document_id</span>
+                            <span class="sql-kwd">JOIN</span> curriculum_changes c <span class="sql-kwd">ON</span>
+                            m.curriculum_id <span class="sql-op">=</span> c.curriculum_id
+                            <span class="sql-kwd">WHERE</span>
+                            c.id <span class="sql-op">=</span> <span class="sql-str">'change-2022-rev-05'</span> <span
+                                class="sql-cmt">-- 이번 변경 건</span>
+                            <span class="sql-op">AND</span> d.status <span class="sql-op">=</span> <span
+                                class="sql-str">'published'</span>; <span class="sql-cmt">-- 발행된 문서만</span>
+                            <span class="sql-cmt">-- Result:</span>
+                            <span class="sql-cmt">-- | doc-101 | "행렬의 기초" | teacher-A | "교육과정 이동됨" |</span>
+                        </div>
+                    </div>
+                    <!-- Right: Visual UI -->
+                    <div class="visual-panel">
+                        <div class="visual-header">
+                            <div class="visual-label">
+                                <i class="fas fa-desktop text-gray-500"></i> Editor UI Alert
+                            </div>
+                            <span class="lang-tag tag-ui">UI Preview</span>
+                        </div>
+                        <div class="visual-body">
+                            <!-- Mock Banner -->
+                            <div class="alert-banner">
+                                <div class="alert-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="alert-content">
+                                    <h4>[교육과정 변경 감지]</h4>
+                                    <p>
+                                        이 문서는 <strong>'2022 개정 교육과정'</strong> 변경 사항의 영향을 받습니다.<br />
+                                        (변경 내용: 행렬 단원 고1 공통수학으로 이동)
+                                    </p>
+                                    <div>
+                                        <a class="alert-action" href="#">
+                                            <i class="fas fa-pencil-alt mr-1"></i> 확인 및 수정하기
+                                        </a>
+                                        <a class="alert-link" href="#">
+                                            공식 문서 보기 <i class="fas fa-external-link-alt ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

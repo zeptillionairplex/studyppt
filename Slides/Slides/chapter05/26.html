@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 비용 시뮬레이션</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Assumption Box */
+        .assumption-box {
+            background-color: #fff;
+            border-left: 5px solid #6366f1;
+            border-radius: 8px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .assumption-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .token-badge {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        /* Table Styling */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+            flex: 1;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 20px;
+            text-align: right;
+            /* Default align numbers right */
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .comparison-table th {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #475569;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #cbd5e1;
+            text-align: center;
+            height: 60px;
+        }
+
+        /* Column Specific Styles */
+        .col-criteria {
+            width: 20%;
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            text-align: left !important;
+            padding-left: 30px !important;
+        }
+
+        .col-competitor {
+            width: 25%;
+            color: #64748b;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+        }
+
+        .col-our-product {
+            width: 30%;
+            background-color: #eff6ff;
+            color: #1e40af;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            position: relative;
+            border-left: 2px solid #bfdbfe;
+            border-right: 2px solid #bfdbfe;
+        }
+
+        th.col-our-product-header {
+            background-color: #3b82f6;
+            color: white;
+            font-size: 1.2rem;
+            border-bottom: none;
+            position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        th.col-our-product-header::after {
+            content: "Recommended Strategy";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fbbf24;
+            color: #92400e;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Last row styling */
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .savings-highlight {
+            color: #059669;
+            /* Green */
+            background-color: #d1fae5;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            font-weight: 800;
+        }
+
+        .model-name {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-weight: 400;
+            display: block;
+            margin-top: 4px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .mix-badge {
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin-top: 5px;
+            display: inline-block;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">비용 시뮬레이션 — 실비 계산</h1>
+            <div class="subtitle">월 1,000회 생성 기준: 59% 비용 절감 효과</div>
+        </div>
+        <div class="content-wrapper">
+            <!-- Assumption Box -->
+            <div class="assumption-box">
+                <div class="assumption-item">
+                    <i class="fas fa-calculator text-indigo-500 text-xl"></i>
+                    <span>1회 문제 생성 기준:</span>
+                </div>
+                <div class="assumption-item">
+                    <span class="text-gray-500">입력(프롬프트+원문)</span>
+                    <span class="token-badge">~4,000 Tokens</span>
+                </div>
+                <div class="assumption-item">
+                    <i class="fas fa-plus text-gray-300 text-sm"></i>
+                </div>
+                <div class="assumption-item">
+                    <span class="text-gray-500">출력(문제+해설)</span>
+                    <span class="token-badge">~6,000 Tokens</span>
+                </div>
+                <div class="assumption-item">
+                    <i class="fas fa-equals text-gray-400"></i>
+                    <span class="font-bold text-gray-700 ml-2">Total 10K Tokens</span>
+                </div>
+            </div>
+            <!-- Cost Table -->
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="col-criteria">구분 (비용 항목)</th>
+                        <th>
+                            Claude Sonnet 4.5
+                            <span class="model-name">단일 고성능 모델 (100%)</span>
+                        </th>
+                        <th>
+                            GPT-4o
+                            <span class="model-name">범용 모델 (100%)</span>
+                        </th>
+                        <th class="col-our-product-header">
+                            <i class="fas fa-random mr-2"></i>LLM Router
+                            <span class="model-name text-white opacity-90">EduContent CMS 전략</span>
+                            <span class="mix-badge">70% Flash + 30% Sonnet</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: 1회 생성 비용 -->
+                    <tr>
+                        <td class="col-criteria">
+                            <i class="fas fa-coins text-gray-400 mr-2 w-6 text-center"></i>1회 생성 단가
+                        </td>
+                        <td class="col-competitor">
+                            $0.102
+                        </td>
+                        <td class="col-competitor">
+                            $0.070
+                        </td>
+                        <td class="col-our-product">
+                            $0.0418
+                        </td>
+                    </tr>
+                    <!-- Row 2: 월 1,000회 -->
+                    <tr class="bg-gray-50">
+                        <td class="col-criteria">
+                            <i class="fas fa-flag text-blue-400 mr-2 w-6 text-center"></i>월 1,000회
+                            <span class="block text-xs text-gray-400 font-normal ml-8 mt-1">초기 운영 (선생님 10명)</span>
+                        </td>
+                        <td class="col-competitor">
+                            $102
+                        </td>
+                        <td class="col-competitor">
+                            $70
+                        </td>
+                        <td class="col-our-product">
+                            $41.8
+                        </td>
+                    </tr>
+                    <!-- Row 3: 월 10,000회 -->
+                    <tr>
+                        <td class="col-criteria">
+                            <i class="fas fa-chart-line text-green-400 mr-2 w-6 text-center"></i>월 10,000회
+                            <span class="block text-xs text-gray-400 font-normal ml-8 mt-1">성장기 (선생님 100명)</span>
+                        </td>
+                        <td class="col-competitor">
+                            $1,020
+                        </td>
+                        <td class="col-competitor">
+                            $700
+                        </td>
+                        <td class="col-our-product">
+                            $418
+                        </td>
+                    </tr>
+                    <!-- Row 4: 월 50,000회 -->
+                    <tr class="bg-gray-50">
+                        <td class="col-criteria">
+                            <i class="fas fa-rocket text-purple-400 mr-2 w-6 text-center"></i>월 50,000회
+                            <span class="block text-xs text-gray-400 font-normal ml-8 mt-1">확장기 (선생님 500명)</span>
+                        </td>
+                        <td class="col-competitor">
+                            $5,100
+                        </td>
+                        <td class="col-competitor">
+                            $3,500
+                        </td>
+                        <td class="col-our-product">
+                            $2,090
+                        </td>
+                    </tr>
+                    <!-- Row 5: 절감률 -->
+                    <tr>
+                        <td class="col-criteria" style="border-bottom: none;">
+                            <i class="fas fa-piggy-bank text-yellow-500 mr-2 w-6 text-center"></i>비용 절감 효과
+                            <span class="block text-xs text-gray-400 font-normal ml-8 mt-1">vs Claude Sonnet</span>
+                        </td>
+                        <td class="col-competitor" style="border-bottom: none;">
+                            <span class="text-gray-400 text-sm">기준점 (Baseline)</span>
+                        </td>
+                        <td class="col-competitor" style="border-bottom: none;">
+                            <span class="text-gray-500 text-sm font-bold">약 31% 절감</span>
+                        </td>
+                        <td class="col-our-product" style="border-bottom: none;">
+                            <div class="savings-highlight">
+                                <i class="fas fa-arrow-down mr-1"></i>59% 절감
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

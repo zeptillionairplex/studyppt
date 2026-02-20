@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - AI 호출 구현 코드</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+            min-height: 0;
+            /* Important for grid overflow handling */
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .badge-env {
+            background-color: #10b981;
+            color: white;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12.5px;
+            /* Adjusted for density */
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* keyword */
+        .def {
+            color: #e5c07b;
+        }
+
+        /* definition */
+        .str {
+            color: #98c379;
+        }
+
+        /* string */
+        .num {
+            color: #d19a66;
+        }
+
+        /* number */
+        .prop {
+            color: #e06c75;
+        }
+
+        /* property */
+        .func {
+            color: #61afef;
+        }
+
+        /* function */
+        .cls {
+            color: #e5c07b;
+        }
+
+        /* class */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* comment */
+        .key {
+            color: #e06c75;
+        }
+
+        /* env key */
+        .val {
+            color: #98c379;
+        }
+
+        /* env value */
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.2);
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Theme Accents */
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        .accent-purple {
+            border-top: 3px solid #8b5cf6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">AI 호출 구현 — .env 한 줄로 모델 전환</h1>
+                <p class="subtitle">OpenAI 호환 인터페이스를 활용한 모델 애그노스틱(Model-Agnostic) 설계</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-code text-blue-500"></i> Backend Implementation
+                </div>
+            </div>
+        </div>
+        <!-- 2x2 Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: AI Client (Yellow Accent) -->
+            <div class="code-block accent-yellow">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-file-code text-blue-400 file-icon"></i>
+                        <span class="file-name">lib/ai-client.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">const</span> AI_CONFIG = {
+                    <span class="prop">baseUrl</span>: process.env.AI_BASE_URL!,
+                    <span class="prop">apiKey</span>: process.env.AI_API_KEY!,
+                    <span class="prop">model</span>: process.env.AI_MODEL!, <span class="cmt">// &lt;-- 변경 포인트</span>
+                    };
+
+                    <span class="kwd">export async function</span> <span class="func">generateQuiz</span>(sysPrompt:
+                    <span class="cls">string</span>, userMsg: <span class="cls">string</span>) {
+                    <span class="kwd">const</span> response = <span class="kwd">await</span> <span
+                        class="func">fetch</span>(`${AI_CONFIG.baseUrl}/chat/completions`, {
+                    <span class="prop">method</span>: <span class="str">'POST'</span>,
+                    <span class="prop">headers</span>: {
+                    <span class="str">'Authorization'</span>: `Bearer ${AI_CONFIG.apiKey}`,
+                    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+                    },
+                    <span class="prop">body</span>: JSON.<span class="func">stringify</span>({
+                    <span class="prop">model</span>: AI_CONFIG.model,
+                    <span class="prop">messages</span>: [
+                    { <span class="prop">role</span>: <span class="str">'system'</span>, <span
+                        class="prop">content</span>: sysPrompt },
+                    { <span class="prop">role</span>: <span class="str">'user'</span>, <span
+                        class="prop">content</span>: userMsg },
+                    ],
+                    <span class="highlight-line"><span class="prop">response_format</span>: { <span
+                            class="prop">type</span>: <span class="str">'json_object'</span> }, <span class="cmt">//
+                            JSON 강제</span></span>
+                    }),
+                    });
+                    <span class="cmt">// ... return parsed result</span>
+                    }
+                </div>
+            </div>
+            <!-- Block 2: Env Configuration (Blue Accent) -->
+            <div class="code-block accent-blue">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-sliders-h text-green-400 file-icon"></i>
+                        <span class="file-name">.env (환경변수 설정)</span>
+                    </div>
+                    <span class="lang-badge badge-env">ENV</span>
+                </div>
+                <div class="code-content"><span class="cmt"># 1. 초기: Google Gemini (Direct)</span>
+                    <span class="key">AI_BASE_URL</span>=<span
+                        class="val">https://generativelanguage.googleapis.com/v1beta/openai</span>
+                    <span class="key">AI_API_KEY</span>=<span class="val">AIzaSy...</span>
+                    <span class="key">AI_MODEL</span>=<span class="val">gemini-2.5-flash</span>
+                    <span class="cmt"># 2. 성장기: OpenRouter 경유 (모델 전환 자유)</span>
+                    <span class="key">AI_BASE_URL</span>=<span class="val">https://openrouter.ai/api/v1</span>
+                    <span class="key">AI_API_KEY</span>=<span class="val">sk-or-...</span>
+                    <span class="highlight-line"><span class="key">AI_MODEL</span>=<span
+                            class="val">google/gemini-2.5-flash</span></span>
+                    <span class="cmt"># 3. 고품질: Claude Sonnet (코드 수정 없이 값만 변경)</span>
+                    <span class="key">AI_BASE_URL</span>=<span class="val">https://openrouter.ai/api/v1</span>
+                    <span class="key">AI_API_KEY</span>=<span class="val">sk-or-...</span>
+                    <span class="highlight-line"><span class="key">AI_MODEL</span>=<span
+                            class="val">anthropic/claude-sonnet-4.5</span></span>
+                </div>
+            </div>
+            <!-- Block 3: Router Logic (Green Accent) -->
+            <div class="code-block accent-green">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-random text-purple-400 file-icon"></i>
+                        <span class="file-name">lib/ai-router.ts (추가 구현 시)</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">export async function</span> <span
+                        class="func">generateQuiz</span>(
+                    sysPrompt: <span class="cls">string</span>,
+                    userMsg: <span class="cls">string</span>,
+                    <span class="highlight-line">quizType: <span class="cls">string</span> <span class="cmt">// &lt;--
+                            라우팅용 파라미터 추가</span></span>
+                    ) {
+                    <span class="kwd">let</span> targetModel = AI_CONFIG.model; <span class="cmt">// 기본값 (저가)</span>
+                    <span class="cmt">// 복잡한 작업(서술형, 응용)은 프리미엄 모델 사용</span>
+                    <span class="highlight-line"><span class="kwd">if</span> ([<span class="str">'application'</span>,
+                        <span class="str">'essay'</span>].<span class="func">includes</span>(quizType)) {</span>
+                    targetModel = process.env.AI_MODEL_PREMIUM!;
+                    }
+
+                    <span class="kwd">const</span> response = <span class="kwd">await</span> <span
+                        class="func">fetch</span>(...) {
+                    <span class="prop">body</span>: JSON.<span class="func">stringify</span>({
+                    <span class="prop">model</span>: targetModel, <span class="cmt">// &lt;-- 분기된 모델 사용</span>
+                    <span class="cmt">// ...</span>
+                    })
+                    }
+                    }
+                </div>
+            </div>
+            <!-- Block 4: Parsing Guard (Purple Accent) -->
+            <div class="code-block accent-purple">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-shield-alt text-red-400 file-icon"></i>
+                        <span class="file-name">lib/utils/json-parser.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">const</span> data = <span class="kwd">await</span>
+                    response.<span class="func">json</span>();
+                    <span class="kwd">const</span> rawContent = data.choices[<span
+                        class="num">0</span>].message.content;
+
+                    <span class="kwd">try</span> {
+                    <span class="cmt">// AI 응답 파싱 및 스키마 검증</span>
+                    <span class="highlight-line"><span class="kwd">const</span> parsed = JSON.<span
+                            class="func">parse</span>(rawContent);</span>
+                    <span class="kwd">if</span> (!parsed.quiz_set || !parsed.quiz_set.questions) {
+                    <span class="kwd">throw new</span> <span class="cls">Error</span>(<span class="str">"Invalid JSON
+                        Schema"</span>);
+                    }
+
+                    <span class="kwd">return</span> parsed;
+
+                    } <span class="kwd">catch</span> (error) {
+                    console.<span class="func">error</span>(<span class="str">"JSON Parsing Failed:"</span>,
+                    rawContent);
+                    <span class="cmt">// 재시도 로직 트리거 또는 에러 반환</span>
+                    <span class="kwd">throw new</span> <span class="cls">Error</span>(<span class="str">"AI Output is
+                        not valid JSON"</span>);
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

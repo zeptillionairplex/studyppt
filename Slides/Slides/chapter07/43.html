@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>문제 상태 머신 — DRAFT에서 APPROVED까지</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 50px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.4rem;
+            color: #1e3a8a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 5px 0 0 0;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            position: relative;
+        }
+
+        /* Diagram Area */
+        .diagram-container {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* State Nodes */
+        .state-node {
+            width: 160px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+
+        .state-node:hover {
+            transform: translateY(-2px);
+        }
+
+        .state-draft {
+            background-color: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            color: #64748b;
+        }
+
+        .state-review {
+            background-color: #eff6ff;
+            border: 2px solid #93c5fd;
+            color: #2563eb;
+        }
+
+        .state-approved {
+            background-color: #ecfdf5;
+            border: 2px solid #6ee7b7;
+            color: #059669;
+        }
+
+        .state-rejected {
+            background-color: #fef2f2;
+            border: 2px solid #fca5a5;
+            color: #dc2626;
+        }
+
+        .state-archived {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            color: #94a3b8;
+        }
+
+        .state-label {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .state-desc {
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* Connectors (SVG) */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Table Area */
+        .table-container {
+            height: 200px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .state-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .state-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 12px 20px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .state-table td {
+            padding: 10px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .state-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-visible {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-hidden {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .code-snippet {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #475569;
+            font-size: 0.8rem;
+        }
+
+        /* Diagram Layout Grid */
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-items: center;
+        }
+
+        /* Rule Box */
+        .rule-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 12px 16px;
+            max-width: 280px;
+            z-index: 20;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .rule-title {
+            color: #92400e;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rule-text {
+            color: #b45309;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        /* Arrow Label */
+        .arrow-label {
+            background-color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">문제 상태 머신 — DRAFT에서 APPROVED까지</h1>
+                <p class="subtitle">AI 생성 문제의 생명주기 관리 및 학생 노출 제어 정책</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-shield-alt mr-1"></i> Quality Assurance
+                </span>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Diagram Area -->
+            <div class="diagram-container">
+                <svg class="connections" viewbox="0 0 1180 300">
+                    <defs>
+                        <marker id="arrowhead" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+                            <polygon fill="#94a3b8" points="0 0, 10 3.5, 0 7"></polygon>
+                        </marker>
+                        <marker id="arrowhead-red" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+                            <polygon fill="#ef4444" points="0 0, 10 3.5, 0 7"></polygon>
+                        </marker>
+                        <marker id="arrowhead-green" markerheight="7" markerwidth="10" orient="auto" refx="9"
+                            refy="3.5">
+                            <polygon fill="#10b981" points="0 0, 10 3.5, 0 7"></polygon>
+                        </marker>
+                    </defs>
+                    <!-- Paths -->
+                    <!-- DRAFT -> IN_REVIEW -->
+                    <path d="M180 150 L310 150" marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="2"></path>
+                    <!-- IN_REVIEW -> APPROVED -->
+                    <path d="M470 150 L600 100" marker-end="url(#arrowhead-green)" stroke="#10b981" stroke-width="2">
+                    </path>
+                    <!-- IN_REVIEW -> REJECTED -->
+                    <path d="M470 150 L600 200" marker-end="url(#arrowhead-red)" stroke="#ef4444" stroke-width="2">
+                    </path>
+                    <!-- REJECTED -> DRAFT (Regeneration) -->
+                    <path d="M680 240 Q 400 320 100 190" fill="none" marker-end="url(#arrowhead)" stroke="#94a3b8"
+                        stroke-dasharray="5,5" stroke-width="2"></path>
+                    <!-- APPROVED -> ARCHIVED -->
+                    <path d="M760 100 L890 100" marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="2"></path>
+                </svg>
+                <div class="diagram-grid" style="position: relative; z-index: 10;">
+                    <!-- DRAFT -->
+                    <div class="state-node state-draft" style="grid-column: 1; grid-row: 1/3;">
+                        <span class="state-label">DRAFT</span>
+                        <span class="state-desc">AI 생성 직후</span>
+                    </div>
+                    <!-- IN_REVIEW -->
+                    <div class="state-node state-review" style="grid-column: 2; grid-row: 1/3;">
+                        <span class="state-label">IN_REVIEW</span>
+                        <span class="state-desc">검수 대기중</span>
+                    </div>
+                    <!-- APPROVED -->
+                    <div class="state-node state-approved" style="grid-column: 3; grid-row: 1;">
+                        <span class="state-label">APPROVED</span>
+                        <span class="state-desc">최종 승인</span>
+                    </div>
+                    <!-- REJECTED -->
+                    <div class="state-node state-rejected" style="grid-column: 3; grid-row: 2;">
+                        <span class="state-label">REJECTED</span>
+                        <span class="state-desc">반려됨</span>
+                    </div>
+                    <!-- ARCHIVED -->
+                    <div class="state-node state-archived" style="grid-column: 4; grid-row: 1;">
+                        <span class="state-label">ARCHIVED</span>
+                        <span class="state-desc">보관 처리</span>
+                    </div>
+                </div>
+                <!-- Labels on lines -->
+                <div class="arrow-label"
+                    style="position: absolute; left: 22%; top: 43%; transform: translate(-50%, -50%);">검수 요청</div>
+                <div class="arrow-label"
+                    style="position: absolute; left: 45%; top: 35%; transform: translate(-50%, -50%); color: #059669;">
+                    승인 (✓)</div>
+                <div class="arrow-label"
+                    style="position: absolute; left: 45%; top: 65%; transform: translate(-50%, -50%); color: #dc2626;">
+                    반려 (✗)</div>
+                <div class="arrow-label"
+                    style="position: absolute; left: 35%; top: 90%; transform: translate(-50%, -50%);">재생성 (🔄)</div>
+                <div class="arrow-label"
+                    style="position: absolute; left: 70%; top: 33%; transform: translate(-50%, -50%);">비활성화</div>
+                <!-- Rule Box -->
+                <div class="rule-box">
+                    <div class="rule-title">
+                        <i class="fas fa-exclamation-triangle"></i> 핵심 보안 규칙
+                    </div>
+                    <p class="rule-text">
+                        학생에게 문제를 제공하는 모든 쿼리에는<br />
+                        반드시 <strong>WHERE status = 'approved'</strong> 조건이<br />
+                        포함되어야 합니다.
+                    </p>
+                </div>
+            </div>
+            <!-- Table Area -->
+            <div class="table-container">
+                <table class="state-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">상태 (Status)</th>
+                            <th class="text-center" width="15%">학생 노출</th>
+                            <th width="45%">설명 및 특징</th>
+                            <th width="25%">다음 가능 상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="code-snippet">draft</span></td>
+                            <td class="text-center"><span class="badge-hidden"><i
+                                        class="fas fa-eye-slash mr-1"></i>불가</span></td>
+                            <td>
+                                <p>AI가 생성한 직후 상태. 선생님만 확인 가능하며 학생에게 절대 노출되지 않음.</p>
+                            </td>
+                            <td><span class="text-xs text-gray-500">in_review</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-snippet">in_review</span></td>
+                            <td class="text-center"><span class="badge-hidden"><i
+                                        class="fas fa-eye-slash mr-1"></i>불가</span></td>
+                            <td>
+                                <p>선생님이 검수 화면에서 확인 중인 상태. 수정 작업이 진행 중일 수 있음.</p>
+                            </td>
+                            <td><span class="text-xs text-gray-500">approved, rejected</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-snippet">approved</span></td>
+                            <td class="text-center"><span class="badge-visible"><i class="fas fa-eye mr-1"></i>노출
+                                    가능</span></td>
+                            <td>
+                                <p>선생님이 최종 승인한 상태. <strong>유일하게 학생 문제은행에 포함되는 상태.</strong></p>
+                            </td>
+                            <td><span class="text-xs text-gray-500">archived</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-snippet">rejected</span></td>
+                            <td class="text-center"><span class="badge-hidden"><i
+                                        class="fas fa-eye-slash mr-1"></i>불가</span></td>
+                            <td>
+                                <p>반려된 문제. 사유(rejection_reason)가 기록되며, 재생성을 위한 데이터로 활용.</p>
+                            </td>
+                            <td><span class="text-xs text-gray-500">draft (재생성 시)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

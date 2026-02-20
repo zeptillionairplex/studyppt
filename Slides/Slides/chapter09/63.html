@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 올림피아드 폭주 방지</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #ef4444;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #b91c1c;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Safety Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 110px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 160px;
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-ceiling {
+            background-color: #ef4444;
+        }
+
+        .icon-zpd {
+            background-color: #f59e0b;
+        }
+
+        .icon-bloom {
+            background-color: #3b82f6;
+        }
+
+        .icon-safe {
+            background-color: #10b981;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 15px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* 2. Limits Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 5px;
+        }
+
+        .limit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .limit-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            padding: 8px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .limit-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .limit-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-mid {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .badge-high {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+
+        .badge-max {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+            /* Important for flex child scroll */
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 6px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .tag-sql {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 12px 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .bool {
+            color: #d19a66;
+            font-weight: bold;
+        }
+
+        .sql-kwd {
+            color: #61afef;
+            font-weight: bold;
+        }
+
+        .sql-str {
+            color: #98c379;
+        }
+
+        .sql-op {
+            color: #c678dd;
+        }
+
+        .highlight-line {
+            background-color: rgba(239, 68, 68, 0.15);
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #ef4444;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">올림피아드 폭주 방지 — 삼중 안전장치</h1>
+                <p class="subtitle">학생 수준을 넘어서는 과도한 난이도의 문제 출제를 원천 차단</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-shield-alt mr-2"></i> Safety Guard
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-layer-group text-red-500"></i> 3-LAYER SAFETY MECHANISM
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-ceiling">
+                            <i class="fas fa-arrows-alt-v"></i>
+                        </div>
+                        <div class="step-title">교육과정 천장</div>
+                        <div class="step-desc">학년별 Elo 상한선<br />(물리적 제한)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-zpd">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="step-title">ZPD 범위 필터</div>
+                        <div class="step-desc">정답률 55~85%<br />(학습 최적 구간)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-bloom">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="step-title">블룸 분류 상한</div>
+                        <div class="step-desc">인지 복잡도 제한<br />(분석/평가/창조)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 4 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-safe">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-title">안전한 문제</div>
+                        <div class="step-desc">적절한 난이도 보장<br />(좌절감 방지)</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Sample -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-ruler-combined text-blue-600"></i> CURRICULUM CEILING LIMITS
+                </div>
+                <div class="table-area">
+                    <table class="limit-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">학년/단계</th>
+                                <th style="width: 20%">Elo 상한 (Ceiling)</th>
+                                <th style="width: 20%">블룸 상한 (Bloom)</th>
+                                <th style="width: 40%">비고 (제한 사유)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-mid">중학교 2학년</span></td>
+                                <td><strong>1,250</strong></td>
+                                <td>Level 4 (분석)</td>
+                                <td>
+                                    <p>고등 선행 개념 차단, 추상적 평가 문항 제외</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-high">고등학교 2학년</span></td>
+                                <td><strong>1,700</strong></td>
+                                <td>Level 5 (평가)</td>
+                                <td>
+                                    <p>수능 범위 내 제한, 대학 수준 심화 이론 제외</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-max">절대 상한선</span></td>
+                                <td><strong>2,200</strong></td>
+                                <td>Level 6 (창조)</td>
+                                <td>
+                                    <p><strong>올림피아드/경시 수준 원천 차단</strong> (특수 목적 제외)</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code Implementation -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> IMPLEMENTATION: DB FILTER &amp; VALIDATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: TypeScript Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> safetyGuard.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">const</span> DIFFICULTY_BOUNDS = {
+                            <span class="prop">middle_2</span>: <span class="num">1250</span>, <span class="cmt">// 중2
+                                상한</span>
+                            <span class="prop">high_2</span>: <span class="num">1700</span>, <span class="cmt">// 고2
+                                상한</span>
+                            <span class="prop">absolute</span>: <span class="num">2200</span> <span class="cmt">// 절대
+                                상한</span>
+                            };
+
+                            <span class="kwd">function</span> <span class="func">validateQuestion</span>(student,
+                            question) {
+                            <span class="kwd">const</span> ceiling = DIFFICULTY_BOUNDS[student.grade];
+
+                            <span class="cmt">// 1. 교육과정 천장 검사</span>
+                            <span class="kwd">if</span> (question.elo &gt; ceiling) {
+                            <span class="highlight-line"><span class="kwd">return</span> <span
+                                    class="bool">false</span>; <span class="cmt">// Too Hard!</span></span>
+                            }
+
+                            <span class="cmt">// 2. ZPD 정답률(55~85%) 검사</span>
+                            <span class="kwd">const</span> prob = <span class="func">expectedScore</span>(student.elo,
+                            question.elo);
+                            <span class="kwd">if</span> (prob &lt; <span class="num">0.55</span> || prob &gt; <span
+                                class="num">0.85</span>) {
+                            <span class="kwd">return</span> <span class="bool">false</span>; <span class="cmt">// Out of
+                                ZPD</span>
+                            }
+                            <span class="kwd">return</span> <span class="bool">true</span>;
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: SQL Usage -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-search text-green-400"></i> SQL Filter
+                            </div>
+                            <span class="lang-tag tag-sql">SQL</span>
+                        </div>
+                        <div class="code-body"><span class="cmt">-- DB 레벨에서 원천적으로 차단</span>
+                            <span class="sql-kwd">SELECT</span> * <span class="sql-kwd">FROM</span> quiz_questions
+                            <span class="sql-kwd">WHERE</span> topic_id <span class="sql-op">=</span> <span
+                                class="sql-str">'math-geometry'</span>
+                            <span class="cmt">-- 안전장치 1: 교육과정 천장</span>
+                            <span class="highlight-line"><span class="sql-op">AND</span> elo_rating <span
+                                    class="sql-op">&lt;=</span> <span class="num">1250</span></span>
+                            <span class="cmt">-- 안전장치 2: 블룸 상한</span>
+                            <span class="sql-op">AND</span> bloom_level <span class="sql-op">&lt;=</span> <span
+                                class="num">4</span>
+                            <span class="cmt">-- 안전장치 3: 경시 문제 제외</span>
+                            <span class="sql-op">AND</span> is_competition_level <span class="sql-op">=</span> <span
+                                class="bool">false</span>
+                            <span class="sql-kwd">ORDER BY</span> <span class="func">RANDOM</span>()
+                            <span class="sql-kwd">LIMIT</span> <span class="num">1</span>;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

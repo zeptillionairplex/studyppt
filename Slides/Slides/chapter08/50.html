@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - Git 기능 선별</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+
+        /* Table Styling */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            table-layout: fixed;
+            margin-bottom: 10px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #475569;
+            background-color: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            text-align: center;
+            padding: 14px 16px;
+        }
+
+        /* Column Specific Styles */
+        .col-feature {
+            width: 18%;
+            background-color: #f8fafc;
+            color: #334155;
+            font-weight: 700;
+            text-align: center !important;
+        }
+
+        .col-status {
+            width: 12%;
+            text-align: center !important;
+        }
+
+        .col-reason {
+            width: 35%;
+            color: #475569;
+        }
+
+        .col-implementation {
+            width: 35%;
+            background-color: #f8fafc;
+            /* Very light gray for code-like content */
+            color: #1e293b;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem !important;
+        }
+
+        /* Highlight Header for Implementation */
+        th.col-implementation-header {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        /* Last row rounded corners */
+        .comparison-table tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+
+        .comparison-table tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .badge-required {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .badge-optional {
+            background-color: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde047;
+        }
+
+        .badge-unnecessary {
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            text-decoration: line-through;
+        }
+
+        /* Icons */
+        .feature-icon {
+            margin-right: 8px;
+            width: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .code-snippet {
+            background-color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .row-highlight {
+            background-color: #eff6ff;
+        }
+
+        .row-highlight .col-feature {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">Git 기능 선별</h1>
+            <div class="subtitle">교육 CMS에 필요한 기능 vs 불필요한 기능</div>
+        </div>
+        <!-- Comparison Table -->
+        <div class="content-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="col-feature">Git 기능</th>
+                        <th class="col-status">필요 여부</th>
+                        <th class="col-reason">이유</th>
+                        <th class="col-implementation-header">구현 방법</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Essential Features -->
+                    <tr class="row-highlight">
+                        <td class="col-feature"><i class="fas fa-camera feature-icon text-blue-500"></i>커밋 (버전 스냅샷)</td>
+                        <td class="col-status"><span class="badge badge-required">필수</span></td>
+                        <td class="col-reason">
+                            <p>매 저장 시 버전을 기록하여 이력 관리</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p class="code-snippet">document_versions</p> <span class="text-gray-500">테이블 INSERT</span>
+                        </td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td class="col-feature"><i class="fas fa-history feature-icon text-blue-500"></i>히스토리 조회</td>
+                        <td class="col-status"><span class="badge badge-required">필수</span></td>
+                        <td class="col-reason">
+                            <p>"3일 전 버전으로 돌아가기" 기능 지원</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p class="code-snippet">SELECT ... ORDER BY version_number</p>
+                        </td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td class="col-feature"><i class="fas fa-not-equal feature-icon text-blue-500"></i>Diff (차이 비교)
+                        </td>
+                        <td class="col-status"><span class="badge badge-required">필수</span></td>
+                        <td class="col-reason">
+                            <p>변경 사항(추가/삭제) 시각적 확인</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p class="code-snippet">jsondiffpatch</p> <span class="text-gray-500">라이브러리 활용</span>
+                        </td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td class="col-feature"><i class="fas fa-undo-alt feature-icon text-blue-500"></i>롤백 (Revert)
+                        </td>
+                        <td class="col-status"><span class="badge badge-required">필수</span></td>
+                        <td class="col-reason">
+                            <p>잘못 수정한 경우 이전 상태로 안전하게 복구</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p>이전 버전 JSON을 새 버전으로 복사 (INSERT)</p>
+                        </td>
+                    </tr>
+                    <tr class="row-highlight">
+                        <td class="col-feature"><i class="fas fa-save feature-icon text-blue-500"></i>자동 저장</td>
+                        <td class="col-status"><span class="badge badge-required">필수</span></td>
+                        <td class="col-reason">
+                            <p>작성 중 실시간 데이터 유실 방지</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p class="code-snippet">document_autosaves</p> <span class="text-gray-500">별도 테이블 운영</span>
+                        </td>
+                    </tr>
+                    <!-- Optional Features -->
+                    <tr>
+                        <td class="col-feature"><i class="fas fa-code-branch feature-icon text-yellow-600"></i>브랜치</td>
+                        <td class="col-status"><span class="badge badge-optional">선택</span></td>
+                        <td class="col-reason">
+                            <p>변형(시험용/정리용) 관리 필요 시 도입</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p class="code-snippet">document_branches</p> <span class="text-gray-500">테이블 (Phase
+                                2)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-feature"><i class="fas fa-code-merge feature-icon text-yellow-600"></i>머지 (Merge)
+                        </td>
+                        <td class="col-status"><span class="badge badge-optional">선택</span></td>
+                        <td class="col-reason">
+                            <p>브랜치 도입 시에만 고려 (복잡도 높음)</p>
+                        </td>
+                        <td class="col-implementation">
+                            <p>JSON 수준 3-way Merge 알고리즘 필요</p>
+                        </td>
+                    </tr>
+                    <!-- Unnecessary Features -->
+                    <tr>
+                        <td class="col-feature"><i class="fas fa-utensils feature-icon text-gray-400"></i>Fork</td>
+                        <td class="col-status"><span class="badge badge-unnecessary">불필요</span></td>
+                        <td class="col-reason">
+                            <p>타 사용자 콘텐츠 복제는 단순 '복사'로 충분</p>
+                        </td>
+                        <td class="col-implementation"><span class="text-gray-400">- (v1 범위 제외) -</span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-feature"><i class="fas fa-code-pull-request feature-icon text-gray-400"></i>Pull
+                            Request</td>
+                        <td class="col-status"><span class="badge badge-unnecessary">불필요</span></td>
+                        <td class="col-reason">
+                            <p>Chapter 7 검수 워크플로가 이 역할 대체</p>
+                        </td>
+                        <td class="col-implementation"><span class="text-gray-400">- (검수 시스템으로 대체) -</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

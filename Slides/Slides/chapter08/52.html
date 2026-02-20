@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 버전 관리 DB 스키마</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-sql {
+            background-color: #e34c26;
+            color: white;
+        }
+
+        .badge-flow {
+            background-color: #8b5cf6;
+            color: white;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Custom Flow Content for Block 4 */
+        .flow-content {
+            padding: 0;
+            white-space: normal;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .flow-split {
+            display: flex;
+            flex: 1;
+            height: 100%;
+        }
+
+        .flow-col {
+            flex: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .flow-col:first-child {
+            border-right: 1px solid #334155;
+            background-color: rgba(30, 41, 59, 0.5);
+        }
+
+        .flow-col:last-child {
+            background-color: rgba(15, 23, 42, 0.3);
+        }
+
+        .flow-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .flow-step {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border-left: 2px solid #475569;
+            color: #94a3b8;
+        }
+
+        .flow-step.highlight {
+            color: #e2e8f0;
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+        }
+
+        /* Syntax Highlighting (SQL Style) */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* keyword: purple */
+        .type {
+            color: #e5c07b;
+        }
+
+        /* data type: yellow */
+        .str {
+            color: #98c379;
+        }
+
+        /* string: green */
+        .num {
+            color: #d19a66;
+        }
+
+        /* number: orange */
+        .obj {
+            color: #61afef;
+        }
+
+        /* object/column: blue */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* comment: gray */
+        .func {
+            color: #56b6c2;
+        }
+
+        /* function: cyan */
+
+        /* Theme Accents */
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        .accent-purple {
+            border-top: 3px solid #8b5cf6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">버전 관리 DB 스키마 설계</h1>
+                <p class="subtitle">브랜치, 자동 저장, Diff 캐시 및 저장 전략</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-database text-blue-500"></i> PostgreSQL Schema
+                </div>
+            </div>
+        </div>
+        <!-- 2x2 Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: document_branches -->
+            <div class="code-block accent-yellow">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-code-branch text-yellow-500 file-icon"></i>
+                        <span class="file-name">Table: document_branches</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> <span
+                        class="obj">document_branches</span> (
+                    <span class="obj">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="obj">document_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> documents(id) <span class="kwd">ON DELETE CASCADE</span>,
+                    <span class="obj">name</span> <span class="type">VARCHAR</span>(100) <span class="kwd">NOT
+                        NULL</span>, <span class="cmt">-- 'main', 'exam-prep'</span>
+                    <span class="obj">description</span> <span class="type">TEXT</span>,
+                    <span class="obj">is_default</span> <span class="type">BOOLEAN</span> <span class="kwd">DEFAULT
+                        FALSE</span>,
+                    <span class="obj">parent_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> <span class="obj">document_branches</span>(id),
+                    <span class="obj">base_version_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> <span class="obj">document_versions</span>(id),
+
+                    <span class="kwd">UNIQUE</span>(<span class="obj">document_id</span>, <span class="obj">name</span>)
+                    );
+                </div>
+            </div>
+            <!-- Block 2: document_autosaves -->
+            <div class="code-block accent-blue">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-save text-blue-400 file-icon"></i>
+                        <span class="file-name">Table: document_autosaves</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> <span
+                        class="obj">document_autosaves</span> (
+                    <span class="obj">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="obj">document_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> documents(id) <span class="kwd">ON DELETE CASCADE</span>,
+                    <span class="obj">branch_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> document_branches(id),
+                    <span class="obj">user_id</span> <span class="type">UUID</span> <span class="kwd">REFERENCES</span>
+                    users(id),
+                    <span class="obj">content_json</span> <span class="type">JSONB</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="obj">saved_at</span> <span class="type">TIMESTAMPTZ</span> <span class="kwd">DEFAULT
+                        NOW</span>(),
+
+                    <span class="cmt">-- 사용자/문서/브랜치당 최신 1개만 유지 (UPSERT Key)</span>
+                    <span class="kwd">UNIQUE</span>(<span class="obj">document_id</span>, <span
+                        class="obj">branch_id</span>, <span class="obj">user_id</span>)
+                    );
+                </div>
+            </div>
+            <!-- Block 3: version_diffs -->
+            <div class="code-block accent-green">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-exchange-alt text-green-400 file-icon"></i>
+                        <span class="file-name">Table: version_diffs</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="cmt">-- 버전 간 diff 결과 캐싱 (jsondiffpatch delta)</span>
+                    <span class="kwd">CREATE TABLE</span> <span class="obj">version_diffs</span> (
+                    <span class="obj">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="obj">from_version_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> document_versions(id),
+                    <span class="obj">to_version_id</span> <span class="type">UUID</span> <span
+                        class="kwd">REFERENCES</span> document_versions(id),
+                    <span class="obj">diff_json</span> <span class="type">JSONB</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="obj">created_at</span> <span class="type">TIMESTAMPTZ</span> <span class="kwd">DEFAULT
+                        NOW</span>(),
+
+                    <span class="kwd">UNIQUE</span>(<span class="obj">from_version_id</span>, <span
+                        class="obj">to_version_id</span>)
+                    );
+                </div>
+            </div>
+            <!-- Block 4: Save Strategy Comparison -->
+            <div class="code-block accent-purple">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-sync-alt text-purple-400 file-icon"></i>
+                        <span class="file-name">Logic: Auto vs Official Save</span>
+                    </div>
+                    <span class="lang-badge badge-flow">FLOW</span>
+                </div>
+                <div class="code-content flow-content">
+                    <div class="flow-split">
+                        <!-- Auto Save Column -->
+                        <div class="flow-col">
+                            <div class="flow-title text-blue-400">
+                                <i class="fas fa-bolt"></i> 자동 저장 (Auto Save)
+                            </div>
+                            <div class="flow-step">
+                                <i class="far fa-clock text-xs mr-1"></i> Trigger: 5초 Debounce
+                            </div>
+                            <div class="flow-step highlight">
+                                <i class="fas fa-database text-xs mr-1"></i> Target: document_autosaves
+                            </div>
+                            <div class="flow-step">
+                                <i class="fas fa-redo text-xs mr-1"></i> Action: UPSERT (항상 1행 유지)
+                            </div>
+                            <div class="flow-step" style="border-left-color: #ef4444; color: #94a3b8;">
+                                <i class="fas fa-ban text-xs mr-1"></i> No Annotation Extract
+                            </div>
+                            <div class="flow-step" style="border-left-color: #ef4444; color: #94a3b8;">
+                                <i class="fas fa-ban text-xs mr-1"></i> No Stale Check
+                            </div>
+                        </div>
+                        <!-- Official Save Column -->
+                        <div class="flow-col">
+                            <div class="flow-title text-green-400">
+                                <i class="fas fa-check-circle"></i> 정식 저장 (Official Save)
+                            </div>
+                            <div class="flow-step">
+                                <i class="far fa-hand-pointer text-xs mr-1"></i> Trigger: "저장" 버튼 클릭
+                            </div>
+                            <div class="flow-step highlight">
+                                <i class="fas fa-database text-xs mr-1"></i> Target: document_versions
+                            </div>
+                            <div class="flow-step">
+                                <i class="fas fa-plus text-xs mr-1"></i> Action: INSERT (버전 번호 증가)
+                            </div>
+                            <div class="flow-step highlight">
+                                <i class="fas fa-tags text-xs mr-1"></i> Annotation 추출 &amp; Diff 계산
+                            </div>
+                            <div class="flow-step highlight">
+                                <i class="fas fa-exclamation-triangle text-xs mr-1"></i> 영향받는 문제 Stale 표시
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

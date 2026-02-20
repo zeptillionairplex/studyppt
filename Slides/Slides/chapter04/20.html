@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 캐스케이드 방지</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* 4-Card Grid Layout */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            border-left: 6px solid transparent;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Card Variants */
+        .card-blue {
+            border-left-color: #3b82f6;
+        }
+
+        .card-green {
+            border-left-color: #10b981;
+        }
+
+        .card-amber {
+            border-left-color: #f59e0b;
+        }
+
+        .card-indigo {
+            border-left-color: #6366f1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            font-size: 1.5rem;
+        }
+
+        .icon-blue {
+            background-color: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .icon-green {
+            background-color: #ecfdf5;
+            color: #10b981;
+        }
+
+        .icon-amber {
+            background-color: #fffbeb;
+            color: #f59e0b;
+        }
+
+        .icon-indigo {
+            background-color: #e0e7ff;
+            color: #6366f1;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        /* Code Snippet Styling */
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            padding: 12px 16px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-label {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .syntax-keyword {
+            color: #c678dd;
+        }
+
+        /* Purple */
+        .syntax-var {
+            color: #e06c75;
+        }
+
+        /* Red */
+        .syntax-string {
+            color: #98c379;
+        }
+
+        /* Green */
+        .syntax-func {
+            color: #61afef;
+        }
+
+        /* Blue */
+        .syntax-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        /* Gray */
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">캐스케이드 방지 — 4가지 안전장치</h1>
+            <div class="subtitle">원문 수정·삭제 시 파생물을 보호하는 전략</div>
+        </div>
+        <!-- 4-Card Grid Content -->
+        <div class="cards-grid">
+            <!-- Card 1: Version Isolation -->
+            <div class="card card-blue">
+                <div class="card-header">
+                    <div class="card-icon-wrapper icon-blue">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <h2 class="card-title">source_version_id 격리</h2>
+                </div>
+                <p class="card-description">
+                    모든 파생물은 특정 원문 버전에 귀속됩니다. 최신 원문이 업데이트되어도, 기존 문제는 생성 당시의 버전을 참조하므로 내용이 변하지 않습니다.
+                </p>
+                <div class="code-block">
+                    <span class="code-label">SQL Logic</span>
+                    <p>
+                        <span class="syntax-keyword">SELECT</span> * <span class="syntax-keyword">FROM</span>
+                        quiz_sets<br />
+                        <span class="syntax-keyword">WHERE</span> source_version_id = <span
+                            class="syntax-string">'v1_uuid'</span>;<br />
+                        <span class="syntax-comment">-- 원문이 v2가 되어도 이 문제는 v1을 참조</span>
+                    </p>
+                </div>
+            </div>
+            <!-- Card 2: Snapshot Preservation -->
+            <div class="card card-green">
+                <div class="card-header">
+                    <div class="card-icon-wrapper icon-green">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h2 class="card-title">original_text_snapshot 보관</h2>
+                </div>
+                <p class="card-description">
+                    각 문제는 생성 시점의 원문 텍스트와 문맥을 자체적으로 저장합니다. 원문이 완전히 삭제되더라도 문제는 독립적인 개체로서 기능합니다.
+                </p>
+                <div class="code-block">
+                    <span class="code-label">Schema Design</span>
+                    <p>
+                        quiz_questions.<span class="syntax-func">original_text_snapshot</span><br />
+                        = <span class="syntax-string">'광합성은 이산화탄소와 물을...'</span><br />
+                        <span class="syntax-comment">-- 원문 의존성 제거 (Decoupling)</span>
+                    </p>
+                </div>
+            </div>
+            <!-- Card 3: Soft Delete -->
+            <div class="card card-amber">
+                <div class="card-header">
+                    <div class="card-icon-wrapper icon-amber">
+                        <i class="fas fa-trash-restore"></i>
+                    </div>
+                    <h2 class="card-title">Soft Delete + 유예 기간</h2>
+                </div>
+                <p class="card-description">
+                    '삭제' 요청 시 즉시 데이터를 지우지 않고 플래그만 변경합니다. 30일간의 복원 유예 기간을 두어 실수로 인한 데이터 손실을 방지합니다.
+                </p>
+                <div class="code-block">
+                    <span class="code-label">Update Query</span>
+                    <p>
+                        <span class="syntax-keyword">UPDATE</span> documents<br />
+                        <span class="syntax-keyword">SET</span> is_archived = <span class="syntax-keyword">TRUE</span>,
+                        deleted_at = <span class="syntax-func">NOW</span>()<br />
+                        <span class="syntax-keyword">WHERE</span> id = <span class="syntax-var">$doc_id</span>;
+                    </p>
+                </div>
+            </div>
+            <!-- Card 4: Change Impact Analysis -->
+            <div class="card card-indigo">
+                <div class="card-header">
+                    <div class="card-icon-wrapper icon-indigo">
+                        <i class="fas fa-search-location"></i>
+                    </div>
+                    <h2 class="card-title">변경 영향 분석 (Diff)</h2>
+                </div>
+                <p class="card-description">
+                    원문 수정 시 이전 버전과의 차이(diff)를 계산하여, 실제 변경된 태그와 연관된 문제만 '재검토 필요(stale)' 상태로 표시합니다.
+                </p>
+                <div class="code-block">
+                    <span class="code-label">Backend Logic</span>
+                    <p>
+                        <span class="syntax-keyword">const</span> affectedTags = <span
+                            class="syntax-func">diff</span>(v1, v2);<br />
+                        <span class="syntax-keyword">if</span> (affectedTags.<span
+                            class="syntax-func">includes</span>(quiz.tagId)) {<br />
+                          quiz.is_stale = <span class="syntax-keyword">true</span>;<br />
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

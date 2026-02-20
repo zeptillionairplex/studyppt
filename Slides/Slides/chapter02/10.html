@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 아키텍처 결정 매트릭스</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 10px;
+        }
+
+        /* Table Styling */
+        .decision-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .decision-table th,
+        .decision-table td {
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .decision-table th {
+            font-weight: 700;
+            color: #475569;
+            background-color: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            text-align: center;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        /* Column Widths */
+        .col-id {
+            width: 5%;
+            text-align: center;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        .col-item {
+            width: 20%;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .col-choice {
+            width: 30%;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .col-reason {
+            width: 45%;
+            color: #475569;
+        }
+
+        /* Highlight Rows */
+        .row-highlight {
+            background-color: #eff6ff;
+        }
+
+        .row-highlight td {
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .row-highlight .col-id {
+            color: #3b82f6;
+        }
+
+        .row-highlight .col-choice {
+            color: #1d4ed8;
+            font-weight: 800;
+        }
+
+        .highlight-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 6px;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Icons */
+        .icon-check {
+            color: #10b981;
+            margin-right: 6px;
+        }
+
+        .icon-star {
+            color: #f59e0b;
+            margin-right: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* Last row */
+        .decision-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Row Hover */
+        .decision-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .decision-table tbody tr.row-highlight:hover {
+            background-color: #e0f2fe;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">아키텍처 핵심 결정 9가지</h1>
+            <div class="subtitle">의사결정 매트릭스 — 최종 선택과 핵심 근거</div>
+        </div>
+        <!-- Decision Matrix Table -->
+        <div class="content-wrapper">
+            <table class="decision-table">
+                <thead>
+                    <tr>
+                        <th class="col-id">#</th>
+                        <th style="text-align: left; padding-left: 20px;">결정 사항 (Decision)</th>
+                        <th style="text-align: left; padding-left: 20px;">최종 선택 (Selected)</th>
+                        <th style="text-align: left; padding-left: 20px;">핵심 근거 (Rationale)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-id">1</td>
+                        <td class="col-item">에디터 (Editor)</td>
+                        <td class="col-choice"><i class="fas fa-pen-nib icon-check"></i>TipTap (ProseMirror)</td>
+                        <td class="col-reason">커스텀 Mark를 통한 의미론적 태깅(Semantic Tagging) 구현 용이</td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">2</td>
+                        <td class="col-item">메인 DB</td>
+                        <td class="col-choice"><i class="fas fa-database icon-check"></i>PostgreSQL</td>
+                        <td class="col-reason">JSONB 네이티브 지원으로 문서 저장과 관계형 데이터 조인을 동시에 해결</td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">3</td>
+                        <td class="col-item">원문 저장 형식</td>
+                        <td class="col-choice"><i class="fas fa-file-code icon-check"></i>TipTap JSON → JSONB</td>
+                        <td class="col-reason">구조화된 SQL 쿼리 가능 (단순 문자열 저장이 아님)</td>
+                    </tr>
+                    <!-- Highlighted Row 4 -->
+                    <tr class="row-highlight">
+                        <td class="col-id"><i class="fas fa-star icon-star"></i>4</td>
+                        <td class="col-item">파생물 관리 패턴</td>
+                        <td class="col-choice">
+                            <span class="highlight-badge">핵심</span>패턴 B (SSOT + 캐시)
+                        </td>
+                        <td class="col-reason">
+                            <strong class="text-blue-700">일관성(SSOT)</strong>과 <strong
+                                class="text-blue-700">성능(캐싱)</strong>의 균형점. AI 재생성 비용 최소화.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">5</td>
+                        <td class="col-item">캐스케이드 방지</td>
+                        <td class="col-choice"><i class="fas fa-shield-alt icon-check"></i>Version 귀속 + 스냅샷</td>
+                        <td class="col-reason">원문 변경/삭제 시에도 이미 생성된 문제 세트가 깨지지 않음</td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">6</td>
+                        <td class="col-item">AI 모델 전략</td>
+                        <td class="col-choice"><i class="fas fa-brain icon-check"></i>LLM Router</td>
+                        <td class="col-reason">단순 작업은 Gemini Flash(저가), 복합 추론은 Claude Sonnet(고가) 분기</td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">7</td>
+                        <td class="col-item">AI 호출 방식</td>
+                        <td class="col-choice"><i class="fas fa-exchange-alt icon-check"></i>OpenAI 호환 REST</td>
+                        <td class="col-reason">SDK 종속성 제거, 환경변수 변경만으로 모델 교체 가능</td>
+                    </tr>
+                    <!-- Highlighted Row 8 -->
+                    <tr class="row-highlight">
+                        <td class="col-id"><i class="fas fa-star icon-star"></i>8</td>
+                        <td class="col-item">버전 관리 (VC)</td>
+                        <td class="col-choice">
+                            <span class="highlight-badge">핵심</span>PG Table + jsondiffpatch
+                        </td>
+                        <td class="col-reason">
+                            Git 라이브러리 대비 <strong class="text-blue-700">복합 SQL 쿼리 유연성</strong> 우월 (예: 특정 단원 내 Stale 문제
+                            찾기)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-id">9</td>
+                        <td class="col-item">학생 적응형</td>
+                        <td class="col-choice"><i class="fas fa-chart-line icon-check"></i>Elo + BKT + 천장제어</td>
+                        <td class="col-reason">정확한 수준 측정과 교육과정 범위 이탈 방지(선행 학습 폭주 제어)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

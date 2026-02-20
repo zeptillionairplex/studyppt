@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 제3자 API 중개 서비스 비교</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Table Styling */
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            table-layout: fixed;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            font-size: 0.95rem;
+        }
+
+        .comparison-table th {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #334155;
+            background-color: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            text-align: center;
+            vertical-align: middle;
+            height: 50px;
+        }
+
+        /* Column Specific Styles */
+        .col-criteria {
+            width: 14%;
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        .col-openrouter {
+            width: 28%;
+            background-color: #eff6ff;
+            border-left: 2px solid #bfdbfe;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .col-inference {
+            width: 28%;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .col-litellm {
+            width: 30%;
+            background-color: #f0fdf4;
+            /* Green tint */
+            border-left: 2px solid #bbf7d0;
+        }
+
+        /* Header Highlights */
+        th.col-openrouter-header {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-top: 4px solid #3b82f6;
+        }
+
+        th.col-inference-header {
+            background-color: #f8fafc;
+            color: #475569;
+            border-top: 4px solid #94a3b8;
+        }
+
+        th.col-litellm-header {
+            background-color: #dcfce7;
+            color: #166534;
+            border-top: 4px solid #22c55e;
+        }
+
+        /* Recommendation Box */
+        .recommendation-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            margin-top: 5px;
+        }
+
+        .step-arrow {
+            font-size: 1.5rem;
+            color: #93c5fd;
+            margin: 0 20px;
+        }
+
+        .rec-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rec-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .rec-text h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .rec-text p {
+            margin: 2px 0 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .badge-rec {
+            background-color: #fbbf24;
+            color: #92400e;
+        }
+
+        .badge-scale {
+            background-color: #22c55e;
+            color: #fff;
+        }
+
+        .pro-item {
+            color: #15803d;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .con-item {
+            color: #b91c1c;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .pro-item i,
+        .con-item i {
+            margin-top: 3px;
+            margin-right: 6px;
+            font-size: 0.8rem;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">제3자 API 중개 서비스 비교</h1>
+            <div class="subtitle">OpenRouter vs LiteLLM vs Inference Cloud — 장단점 분석</div>
+        </div>
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Comparison Table -->
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="col-criteria">구분</th>
+                        <th class="col-openrouter-header">
+                            <div class="flex flex-col items-center">
+                                <span class="badge badge-rec mb-1">초기 추천 (Phase 1)</span>
+                                <span>OpenRouter</span>
+                            </div>
+                        </th>
+                        <th class="col-inference-header">
+                            Groq / Together AI
+                        </th>
+                        <th class="col-litellm-header">
+                            <div class="flex flex-col items-center">
+                                <span class="badge badge-scale mb-1">확장기 추천 (Phase 2)</span>
+                                <span>LiteLLM (Self-Hosted)</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: 서비스 유형 -->
+                    <tr>
+                        <td class="col-criteria">서비스 유형</td>
+                        <td class="col-openrouter">
+                            <span class="font-bold text-blue-800">API Aggregator</span><br />
+                            <span class="text-xs text-gray-500">모든 모델의 허브</span>
+                        </td>
+                        <td class="col-inference">
+                            <span class="font-bold text-gray-700">Inference Cloud</span><br />
+                            <span class="text-xs text-gray-500">추론 전용 클라우드</span>
+                        </td>
+                        <td class="col-litellm">
+                            <span class="font-bold text-green-800">Proxy Gateway</span><br />
+                            <span class="text-xs text-gray-500">자체 구축 미들웨어</span>
+                        </td>
+                    </tr>
+                    <!-- Row 2: 모델 다양성 -->
+                    <tr>
+                        <td class="col-criteria">지원 모델</td>
+                        <td class="col-openrouter">
+                            <div class="font-bold text-lg text-blue-600">300+ 개</div>
+                            <p class="text-sm mt-1">GPT-4, Claude, Gemini, Llama 등 모든 메이저 모델 통합</p>
+                        </td>
+                        <td class="col-inference">
+                            <div class="font-bold text-lg text-gray-600">오픈소스 중심</div>
+                            <p class="text-sm mt-1">Llama 3, Mixtral 등<br />(Claude/GPT 없음)</p>
+                        </td>
+                        <td class="col-litellm">
+                            <div class="font-bold text-lg text-green-600">100+ 개 연동</div>
+                            <p class="text-sm mt-1">원하는 모든 Provider API를 직접 연결하여 표준화</p>
+                        </td>
+                    </tr>
+                    <!-- Row 3: 비용/수수료 -->
+                    <tr>
+                        <td class="col-criteria">수수료</td>
+                        <td class="col-openrouter">
+                            <span class="text-red-600 font-bold">약 5.5% 추가</span><br />
+                            <span class="text-xs text-gray-500">(편의성 비용 포함)</span>
+                        </td>
+                        <td class="col-inference">
+                            <span class="text-blue-600 font-bold">매우 저렴</span><br />
+                            <span class="text-xs text-gray-500">(직접 가격 책정)</span>
+                        </td>
+                        <td class="col-litellm">
+                            <span class="text-green-600 font-bold">$0 (수수료 없음)</span><br />
+                            <span class="text-xs text-gray-500">(단, 서버 운영비 발생)</span>
+                        </td>
+                    </tr>
+                    <!-- Row 4: 장점 -->
+                    <tr>
+                        <td class="col-criteria">핵심 장점</td>
+                        <td class="col-openrouter">
+                            <div class="pro-item"><i class="fas fa-check"></i>설정 1분 완료 (키 하나로 통일)</div>
+                            <div class="pro-item"><i class="fas fa-check"></i>모델 전환 자유도 최상</div>
+                        </td>
+                        <td class="col-inference">
+                            <div class="pro-item"><i class="fas fa-bolt"></i>Groq: 압도적 속도 (LPU)</div>
+                            <div class="pro-item"><i class="fas fa-check"></i>Together: 파인튜닝 지원</div>
+                        </td>
+                        <td class="col-litellm">
+                            <div class="pro-item"><i class="fas fa-shield-alt"></i>데이터 프라이버시 (로그 통제)</div>
+                            <div class="pro-item"><i class="fas fa-coins"></i>중개 수수료 0%</div>
+                        </td>
+                    </tr>
+                    <!-- Row 5: 단점/리스크 -->
+                    <tr>
+                        <td class="col-criteria">단점/리스크</td>
+                        <td class="col-openrouter">
+                            <div class="con-item"><i class="fas fa-exclamation-circle"></i>데이터가 제3자 서버 경유</div>
+                            <div class="con-item"><i class="fas fa-clock"></i>약간의 추가 레이턴시</div>
+                        </td>
+                        <td class="col-inference">
+                            <div class="con-item"><i class="fas fa-times"></i>상용 모델(Claude 등) 미지원</div>
+                            <div class="con-item"><i class="fas fa-cubes"></i>파편화된 API 관리</div>
+                        </td>
+                        <td class="col-litellm">
+                            <div class="con-item"><i class="fas fa-tools"></i>직접 설치/운영 부담 (DevOps)</div>
+                            <div class="con-item"><i class="fas fa-server"></i>서버 가용성 직접 관리</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Recommendation Strategy Box -->
+            <div class="recommendation-box">
+                <div class="rec-step">
+                    <div class="rec-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="rec-text">
+                        <h4>Phase 1: 초기 도입 (OpenRouter)</h4>
+                        <p>월 $500 미만 구간. 개발 속도 최우선. API 키 하나로 최적의 모델 조합 탐색.</p>
+                    </div>
+                </div>
+                <div class="step-arrow"><i class="fas fa-angle-double-right"></i></div>
+                <div class="rec-step">
+                    <div class="rec-icon"><i class="fas fa-server"></i></div>
+                    <div class="rec-text">
+                        <h4>Phase 2: 규모 확장 (LiteLLM)</h4>
+                        <p>월 $1,000 이상 구간. 자체 서버에 LiteLLM 배포. 수수료 절감 및 데이터 보안 강화.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

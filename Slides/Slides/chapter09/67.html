@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 티어별 서비스 분기</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Layout */
+        .content-area {
+            display: flex;
+            gap: 40px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .main-pipeline {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .side-flow {
+            flex: 1;
+            background-color: #f0f9ff;
+            /* Sky 50 */
+            border: 2px dashed #0284c7;
+            /* Sky 600 */
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .section-label {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Pipeline Steps */
+        .pipeline-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            height: 145px;
+        }
+
+        .step-num {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .step-icon {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .step-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            line-height: 1.35;
+            margin: 0;
+            flex: 1;
+        }
+
+        .tech-tag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 2px 6px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        /* Step Styles - Tier Based */
+        /* Common Steps */
+        .step-common {
+            border-left-color: #64748b;
+        }
+
+        .step-common .step-icon {
+            background-color: #64748b;
+        }
+
+        /* Free Tier */
+        .step-free {
+            border-left-color: #94a3b8;
+        }
+
+        .step-free .step-icon {
+            background-color: #94a3b8;
+        }
+
+        /* Standard Tier */
+        .step-std {
+            border-left-color: #3b82f6;
+        }
+
+        .step-std .step-icon {
+            background-color: #3b82f6;
+        }
+
+        /* Premium Tier */
+        .step-prem {
+            border-left-color: #8b5cf6;
+        }
+
+        .step-prem .step-icon {
+            background-color: #8b5cf6;
+        }
+
+        /* Update Step */
+        .step-update {
+            border-left-color: #059669;
+        }
+
+        .step-update .step-icon {
+            background-color: #059669;
+        }
+
+
+        /* Side Flow Styling */
+        .side-title {
+            color: #0369a1;
+            /* Sky 700 */
+        }
+
+        .side-step {
+            background-color: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .side-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .side-icon {
+            color: #0284c7;
+            font-size: 1.2rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .side-text {
+            font-size: 0.9rem;
+            color: #0c4a6e;
+            /* Sky 950 */
+            font-weight: 600;
+        }
+
+        .side-subtext {
+            font-size: 0.75rem;
+            color: #0369a1;
+            /* Sky 800 */
+            display: block;
+            margin-top: 2px;
+        }
+
+        .trigger-badge {
+            background-color: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid #bae6fd;
+        }
+
+        /* Flow Arrow CSS */
+        .flow-line {
+            width: 2px;
+            height: 15px;
+            background-color: #7dd3fc;
+            margin-left: 26px;
+            margin-bottom: 4px;
+            margin-top: -8px;
+        }
+
+        /* Arrows logic visualization */
+        .branch-label {
+            position: absolute;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            background: #fff;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            z-index: 5;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">티어별 적응형 학습 서비스 분기</h1>
+                <p class="subtitle">구독 등급(Tier)에 따른 AI 활용도 및 맞춤형 콘텐츠 제공 전략</p>
+            </div>
+            <div style="text-align: right; color: #64748b; font-size: 0.9rem;">
+                <i class="fas fa-layer-group text-blue-600 mr-2"></i>Adaptive Learning Pipeline
+            </div>
+        </div>
+        <div class="content-area">
+            <!-- Main Pipeline (Left) -->
+            <div class="main-pipeline">
+                <div class="section-label text-slate-700">
+                    <i class="fas fa-network-wired"></i> Service Workflow
+                </div>
+                <div class="pipeline-container">
+                    <!-- Step 1: Common -->
+                    <div class="step-card step-common">
+                        <div class="step-num">01</div>
+                        <div class="step-icon">
+                            <i class="fas fa-id-card-alt"></i>
+                        </div>
+                        <h3 class="step-title">프로파일 조회 (Start)</h3>
+                        <p class="step-desc">학생의 Elo 레이팅, 구독 티어, 현재 학습 목표(Goal)를 로드</p>
+                        <span class="tech-tag">SELECT student_profiles</span>
+                    </div>
+                    <!-- Step 2: Common -->
+                    <div class="step-card step-common">
+                        <div class="step-num">02</div>
+                        <div class="step-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="step-title">안전장치 &amp; 필터링</h3>
+                        <p class="step-desc">교육과정 천장 적용, ZPD(55~85%) 범위 설정, 경시 문제 제외</p>
+                        <span class="tech-tag">Filter Logic</span>
+                    </div>
+                    <!-- Step 3: Free -->
+                    <div class="step-card step-free">
+                        <div class="step-num">Branch A</div>
+                        <div class="step-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="step-title">[Free] 문제은행 매칭</h3>
+                        <p class="step-desc">AI 생성 없음. 선생님이 검수한 기존 문제 중 ZPD 최적 매칭</p>
+                        <span class="tech-tag">Cost: $0 / Static</span>
+                    </div>
+                    <!-- Step 4: Standard -->
+                    <div class="step-card step-std">
+                        <div class="step-num">Branch B</div>
+                        <div class="step-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="step-title">[Standard] AI 맞춤</h3>
+                        <p class="step-desc">저가형 모델 활용. 학생 약점 태그를 반영한 유사 변형 생성</p>
+                        <span class="tech-tag">Gemini Flash ($0.016)</span>
+                    </div>
+                    <!-- Step 5: Premium -->
+                    <div class="step-card step-prem">
+                        <div class="step-num">Branch C</div>
+                        <div class="step-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3 class="step-title">[Premium] 완전 맞춤</h3>
+                        <p class="step-desc">고성능 모델 활용. 심층 추론 문제 및 상세 피드백 생성</p>
+                        <span class="tech-tag">Claude Sonnet ($0.10)</span>
+                    </div>
+                    <!-- Step 6: Update -->
+                    <div class="step-card step-update">
+                        <div class="step-num">Final</div>
+                        <div class="step-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <h3 class="step-title">결과 처리 &amp; 업데이트</h3>
+                        <p class="step-desc">풀이 결과에 따라 Elo 및 BKT 상태 즉시 갱신, 로그 저장</p>
+                        <span class="tech-tag">State Update</span>
+                    </div>
+                </div>
+                <!-- Logical Connection Lines (Abstracted visual cues) -->
+                <div class="branch-label" style="top: 140px; left: 50%; transform: translateX(-50%);">
+                    <i class="fas fa-code-branch"></i> Tier Branching
+                </div>
+                <div
+                    style="position: absolute; top: 153px; left: 50%; width: 2px; height: 16px; background: #cbd5e1; transform: translateX(-50%);">
+                </div>
+                <div style="position: absolute; top: 168px; left: 25%; width: 50%; height: 2px; background: #cbd5e1;">
+                </div>
+                <div style="position: absolute; top: 168px; left: 25%; width: 2px; height: 10px; background: #cbd5e1;">
+                </div>
+                <div style="position: absolute; top: 168px; left: 75%; width: 2px; height: 10px; background: #cbd5e1;">
+                </div>
+                <!-- Arrows pointing to row 3 -->
+                <div style="position: absolute; top: 320px; left: 25%; width: 2px; height: 15px; background: #cbd5e1;">
+                </div>
+                <div style="position: absolute; top: 320px; left: 75%; width: 2px; height: 15px; background: #cbd5e1;">
+                </div>
+                <div style="position: absolute; top: 328px; left: 25%; width: 50%; height: 2px; background: #cbd5e1;">
+                </div>
+                <div style="position: absolute; top: 328px; left: 75%; width: 2px; height: 10px; background: #cbd5e1;">
+                </div>
+                <div class="branch-label"
+                    style="top: 315px; left: 75%; transform: translateX(-50%); background: #ecfdf5; border-color: #a7f3d0; color: #059669;">
+                    <i class="fas fa-arrow-down"></i> Merge
+                </div>
+            </div>
+            <!-- Side Flow (Right) -->
+            <div class="side-flow">
+                <div class="section-label side-title">
+                    <i class="fas fa-database"></i> Post-Solve Updates
+                </div>
+                <div class="trigger-badge">
+                    <i class="fas fa-check-circle mr-1"></i> Trigger: 풀이 완료 시
+                </div>
+                <!-- Side Step A -->
+                <div class="side-step">
+                    <div class="side-icon"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <p class="side-text">Elo 레이팅</p>
+                        <span class="side-subtext">학생(↑↓) &amp; 문제(↑↓) 난이도 조정</span>
+                    </div>
+                </div>
+                <div class="flow-line"></div>
+                <!-- Side Step B -->
+                <div class="side-step">
+                    <div class="side-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div>
+                        <p class="side-text">BKT 지식 상태</p>
+                        <span class="side-subtext">단원별 숙달도 확률(P_Learn) 갱신</span>
+                    </div>
+                </div>
+                <div class="flow-line"></div>
+                <!-- Side Step C -->
+                <div class="side-step">
+                    <div class="side-icon"><i class="fas fa-history"></i></div>
+                    <div>
+                        <p class="side-text">Learning Logs</p>
+                        <span class="side-subtext">풀이 시점의 Elo 스냅샷 저장</span>
+                    </div>
+                </div>
+                <div class="flow-line"></div>
+                <!-- Side Step D -->
+                <div class="side-step">
+                    <div class="side-icon"><i class="fas fa-coins"></i></div>
+                    <div>
+                        <p class="side-text">사용량 집계</p>
+                        <span class="side-subtext">AI 생성 시 월간 한도 차감</span>
+                    </div>
+                </div>
+                <div
+                    style="margin-top: auto; background-color: white; padding: 10px; border-radius: 8px; font-size: 0.8rem; color: #0369a1; border: 1px solid #bae6fd;">
+                    <i class="fas fa-info-circle mr-1"></i> <strong>원칙:</strong> Free 유저는 AI 비용이 0이므로 무제한 확장이 가능합니다.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

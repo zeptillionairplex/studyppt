@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Redis 캐시 키 설계</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #ef4444;
+            /* Redis Red */
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #991b1b;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Logic Area */
+        .logic-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 100px;
+        }
+
+        .logic-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-params {
+            background-color: #3b82f6;
+        }
+
+        .icon-hash {
+            background-color: #f59e0b;
+        }
+
+        .icon-key {
+            background-color: #dc2626;
+        }
+
+        /* Redis Red */
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -12px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 4px;
+        }
+
+        /* 2. Key Components Table */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .db-table th {
+            background-color: #fef2f2;
+            /* Light Red */
+            color: #991b1b;
+            padding: 8px 15px;
+            text-align: left;
+            border-bottom: 2px solid #fee2e2;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .param-desc {
+            color: #64748b;
+            font-size: 0.75rem;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .param-name {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* 3. Code & Design Area */
+        .bottom-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1.2;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .design-panel {
+            flex: 0.8;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 12px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .highlight-line {
+            background-color: rgba(220, 38, 38, 0.2);
+            /* Red tint */
+            display: block;
+            margin: 0 -12px;
+            padding: 0 12px;
+            border-left: 3px solid #dc2626;
+        }
+
+        /* Tier Design */
+        .tier-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .tier-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .tier-badge {
+            font-size: 0.65rem;
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-broad {
+            background-color: #3b82f6;
+        }
+
+        .badge-fine {
+            background-color: #10b981;
+        }
+
+        .tier-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+            line-height: 1.3;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">1단계 — 애플리케이션 레벨 캐시 (Redis)</h1>
+                <p class="subtitle">같은 조건의 요청은 AI를 호출하지 않는다 (비용 $0)</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-server mr-2"></i> Application Cache
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Logic Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-key text-red-500"></i> CACHE KEY GENERATION LOGIC
+                </div>
+                <div class="logic-area">
+                    <!-- Step 1 -->
+                    <div class="logic-step">
+                        <div class="step-icon icon-params">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <div class="step-title">Parameters Object</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">JSON.stringify &amp; Sort</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="logic-step">
+                        <div class="step-icon icon-hash">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="step-title">SHA-256 Hashing</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Prefixing</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="logic-step">
+                        <div class="step-icon icon-key">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="step-title">Redis Key</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Components Table -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-list text-blue-600"></i> KEY COMPONENTS
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%">Parameter</th>
+                                <th style="width: 45%">Description</th>
+                                <th style="width: 30%">Why it matters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="param-name">documentVersionId</td>
+                                <td><span class="param-desc">원문 버전의 고유 UUID (v1, v2...)</span></td>
+                                <td><span class="param-desc">원문 수정 시 키 자동 변경 → 캐시 무효화</span></td>
+                            </tr>
+                            <tr>
+                                <td class="param-name">quizType &amp; difficulty</td>
+                                <td><span class="param-desc">문제 유형(MCQ/Blank) 및 난이도</span></td>
+                                <td><span class="param-desc">같은 원문이라도 다른 유형이면 별도 생성</span></td>
+                            </tr>
+                            <tr>
+                                <td class="param-name">annotationIds</td>
+                                <td><span class="param-desc">태깅된 ID 배열 (Sorted)</span></td>
+                                <td><span class="param-desc">특정 태그 조합에 정확히 매칭되는 문제</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code & Design -->
+            <div class="bottom-container">
+                <!-- Left: TypeScript Code -->
+                <div class="code-panel">
+                    <div class="panel-header">
+                        <div class="panel-label">
+                            <i class="fas fa-file-code text-blue-400"></i> lib/ai-cache.ts
+                        </div>
+                        <span class="lang-tag tag-ts">TS</span>
+                    </div>
+                    <div class="code-body"><span class="kwd">const</span> CACHE_TTL = <span class="num">7</span> * <span
+                            class="num">24</span> * <span class="num">60</span> * <span class="num">60</span>; <span
+                            class="cmt">// 7 Days</span>
+                        <span class="kwd">function</span> <span class="func">buildCacheKey</span>(params: <span
+                            class="kwd">any</span>): <span class="kwd">string</span> {
+                        <span class="kwd">const</span> raw = <span class="kwd">JSON</span>.<span
+                            class="func">stringify</span>({
+                        v: params.<span class="prop">documentVersionId</span>, <span class="cmt">// 핵심: 버전 변경 시 키
+                            변경</span>
+                        t: params.<span class="prop">quizType</span>,
+                        d: params.<span class="prop">difficulty</span>,
+                        a: params.<span class="prop">annotationIds</span>.<span class="func">sort</span>(), <span
+                            class="cmt">// 순서 무관하게 정렬</span>
+                        c: params.<span class="prop">count</span>
+                        });
+
+                        <span class="highlight-line"><span class="kwd">return</span> <span
+                                class="str">`quiz:${createHash('sha256').update(raw).digest('hex')}`</span>;</span>
+                        }
+
+                        <span class="kwd">export async function</span> <span class="func">getCachedQuiz</span>(params) {
+                        <span class="kwd">const</span> key = <span class="func">buildCacheKey</span>(params);
+                        <span class="kwd">const</span> cached = <span class="kwd">await</span> redis.<span
+                            class="func">get</span>(key);
+                        <span class="kwd">return</span> cached ? <span class="kwd">JSON</span>.<span
+                            class="func">parse</span>(cached) : <span class="kwd">null</span>;
+                        }
+                    </div>
+                </div>
+                <!-- Right: 2-Tier Design -->
+                <div class="design-panel">
+                    <div class="section-label" style="margin-bottom:5px;">
+                        <i class="fas fa-layer-group text-purple-500"></i> 2-TIER CACHE STRATEGY
+                    </div>
+                    <div class="tier-box">
+                        <div class="tier-title">
+                            <span>1계층: 단원 기반 (Broad)</span>
+                            <span class="tier-badge badge-broad">Student Use</span>
+                        </div>
+                        <p class="tier-desc">
+                            hash(단원ID + 유형 + 난이도)<br />
+                            → 같은 단원이면 선생님 달라도 재활용 (Free Tier)
+                        </p>
+                    </div>
+                    <div class="tier-box">
+                        <div class="tier-title">
+                            <span>2계층: 문서 버전 기반 (Fine)</span>
+                            <span class="tier-badge badge-fine">Teacher Use</span>
+                        </div>
+                        <p class="tier-desc">
+                            hash(버전ID + 태그ID + 유형)<br />
+                            → 내가 만든 원문, 내가 태깅한 포인트 정확 반영
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

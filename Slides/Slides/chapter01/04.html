@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 사용자별 가치 제안</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 40px 60px;
+            box-sizing: border-box;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e2e8f0" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #1e3a8a;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            justify-content: space-between;
+            flex: 1;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .persona-card {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .card-header {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-icon-bg {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .persona-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .persona-role {
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-body {
+            padding: 0 24px 24px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .benefit-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .check-icon {
+            margin-right: 12px;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Specific Styles for Each Persona */
+        /* Teacher - Blue */
+        .card-teacher {
+            border-top: 6px solid #3b82f6;
+        }
+
+        .card-teacher .card-icon-bg {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+
+        .card-teacher .persona-name {
+            color: #1e40af;
+        }
+
+        .card-teacher .persona-role {
+            color: #60a5fa;
+        }
+
+        .card-teacher .check-icon {
+            color: #3b82f6;
+        }
+
+        .card-teacher-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: translate(30%, -30%);
+            z-index: 0;
+        }
+
+        /* Student - Emerald/Green */
+        .card-student {
+            border-top: 6px solid #10b981;
+        }
+
+        .card-student .card-icon-bg {
+            background-color: #ecfdf5;
+            color: #059669;
+        }
+
+        .card-student .persona-name {
+            color: #065f46;
+        }
+
+        .card-student .persona-role {
+            color: #34d399;
+        }
+
+        .card-student .check-icon {
+            color: #10b981;
+        }
+
+        .card-student-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: translate(30%, -30%);
+            z-index: 0;
+        }
+
+        /* Academy - Violet/Purple */
+        .card-academy {
+            border-top: 6px solid #8b5cf6;
+        }
+
+        .card-academy .card-icon-bg {
+            background-color: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        .card-academy .persona-name {
+            color: #5b21b6;
+        }
+
+        .card-academy .persona-role {
+            color: #a78bfa;
+        }
+
+        .card-academy .check-icon {
+            color: #8b5cf6;
+        }
+
+        .card-academy-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: translate(30%, -30%);
+            z-index: 0;
+        }
+
+        .highlight-box {
+            margin-top: auto;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .hl-teacher {
+            background-color: #eff6ff;
+            color: #1e40af;
+        }
+
+        .hl-student {
+            background-color: #ecfdf5;
+            color: #065f46;
+        }
+
+        .hl-academy {
+            background-color: #f5f3ff;
+            color: #5b21b6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">사용자별 가치 제안</h1>
+            <div class="subtitle">누가, 왜 쓰는가 — 3가지 관점의 이점</div>
+        </div>
+        <!-- 3 Columns Persona Cards -->
+        <div class="cards-wrapper">
+            <!-- Persona 1: Teacher -->
+            <div class="persona-card card-teacher">
+                <div class="card-teacher-bg"></div>
+                <div class="card-header">
+                    <div class="card-icon-bg">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <p class="persona-name">선생님</p>
+                    <p class="persona-role">CONTENT CREATOR</p>
+                </div>
+                <div class="card-body">
+                    <ul class="benefit-list">
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>원 소스 멀티 유즈:</strong> 원문 작성 한 번으로 시험지, 워크시트, 개념 카드 자동 생성</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>품질 &amp; 시간:</strong> AI가 초안을 잡고 선생님이 검수하여 고품질 문제 확보 (시간 70% 절약)</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>동기화 관리:</strong> 원문 수정 시 파생된 문제들도 자동으로 추적 및 업데이트 알림</p>
+                        </li>
+                    </ul>
+                    <div class="highlight-box hl-teacher">
+                        <i class="fas fa-star mr-1"></i> "자료 제작의 고통에서 해방"
+                    </div>
+                </div>
+            </div>
+            <!-- Persona 2: Student -->
+            <div class="persona-card card-student">
+                <div class="card-student-bg"></div>
+                <div class="card-header">
+                    <div class="card-icon-bg">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <p class="persona-name">학생</p>
+                    <p class="persona-role">ACTIVE LEARNER</p>
+                </div>
+                <div class="card-body">
+                    <ul class="benefit-list">
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>적응형 난이도:</strong> 내 수준(Elo Rating)에 딱 맞는 문제가 자동 선별되어 제공됨</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>약점 공략:</strong> 시스템이 취약 단원을 찾아 집중 연습 문제를 추천 (BKT 모델)</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>메타인지 강화:</strong> 브레인 덤프 기능을 통해 '아는 것과 모르는 것'을 명확히 구분</p>
+                        </li>
+                    </ul>
+                    <div class="highlight-box hl-student">
+                        <i class="fas fa-rocket mr-1"></i> "나만을 위한 맞춤형 과외 선생님"
+                    </div>
+                </div>
+            </div>
+            <!-- Persona 3: Academy/Institution -->
+            <div class="persona-card card-academy">
+                <div class="card-academy-bg"></div>
+                <div class="card-header">
+                    <div class="card-icon-bg">
+                        <i class="fas fa-school"></i>
+                    </div>
+                    <p class="persona-name">학원 / 기관</p>
+                    <p class="persona-role">ADMINISTRATOR</p>
+                </div>
+                <div class="card-body">
+                    <ul class="benefit-list">
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>자산화:</strong> 강사별 파편화된 자료를 학원 통합 문제은행 데이터베이스로 자산화</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>학습 분석:</strong> 학생별 성취도 대시보드 및 학부모 발송용 리포트 자동 생성</p>
+                        </li>
+                        <li class="benefit-item">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <p><strong>커스텀 운영:</strong> 반별 난이도·진도 설정 및 자체 모의고사 시뮬레이션 운영</p>
+                        </li>
+                    </ul>
+                    <div class="highlight-box hl-academy">
+                        <i class="fas fa-chart-pie mr-1"></i> "데이터 기반의 체계적 학원 운영"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

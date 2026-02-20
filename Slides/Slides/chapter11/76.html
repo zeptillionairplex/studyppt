@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 법적 검토 개요</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Flexbox Layout for the slide container */
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+
+        .circle-1 {
+            width: 600px;
+            height: 600px;
+            background-color: #ef4444;
+            /* Changed to red-ish for risk/legal theme warning nuance */
+            top: -200px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background-color: #1e40af;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 0 80px;
+        }
+
+        .logo-area {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #b91c1c;
+            /* Dark red for legal importance */
+        }
+
+        .main-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 5rem;
+            color: #1e3a8a;
+            line-height: 1.1;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+        }
+
+        .sub-title {
+            font-size: 1.75rem;
+            color: #64748b;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .quote-box {
+            position: relative;
+            background-color: #fef2f2;
+            /* Red tint background */
+            padding: 2.5rem 4rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.1);
+            max-width: 1000px;
+            border-left: 8px solid #ef4444;
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background-color: #ef4444;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .quote-text {
+            font-size: 1.7rem;
+            color: #991b1b;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .footer-desc {
+            margin-top: 3rem;
+            text-align: center;
+            color: #475569;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 850px;
+            background-color: #f1f5f9;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .badge {
+            background-color: #fff;
+            color: #1e293b;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .badge i {
+            color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Decorative Background Elements -->
+        <div class="decorative-circle circle-1"></div>
+        <div class="decorative-circle circle-2"></div>
+        <div class="content-wrapper">
+            <!-- Logo / Brand Area -->
+            <div class="logo-area">
+                <i class="fas fa-scale-balanced fa-2x"></i>
+                <span style="font-size: 1.5rem; font-weight: 700;">Chapter 11. 법적 검토</span>
+            </div>
+            <!-- Main Title -->
+            <p class="main-title">교육 플랫폼의 법적 리스크</p>
+            <p class="sub-title">무시하면 서비스가 멈출 수 있는 3대 핵심 영역</p>
+            <!-- Key Message Quote -->
+            <div class="quote-box">
+                <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="quote-text">
+                    "교원의 콘텐츠 판매, 학생 개인정보 처리, AI를 통한 데이터 경유 —<br />
+                    이 세 가지가 법적 검토 없이 진행하면 안 되는 영역이다."
+                </p>
+            </div>
+            <!-- Description & Badges -->
+            <div class="footer-desc">
+                <p style="margin: 0; font-weight: 500;">
+                    <i class="fas fa-exclamation-triangle" style="color: #f59e0b; margin-right: 0.5rem;"></i>
+                    면책 안내: 이 Chapter의 내용은 공개 자료 기반의 방향 설정이며,<br />
+                    구체적인 약관과 정책은 반드시 <strong>전문 변호사의 검토</strong>를 거쳐야 합니다.
+                </p>
+            </div>
+            <div class="badge-container">
+                <div class="badge">
+                    <i class="fas fa-chalkboard-teacher"></i> [A] 교원 겸직·마켓플레이스
+                </div>
+                <div class="badge">
+                    <i class="fas fa-user-shield"></i> [B] 학생 개인정보 보호
+                </div>
+                <div class="badge">
+                    <i class="fas fa-server"></i> [C] AI 데이터 경유
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

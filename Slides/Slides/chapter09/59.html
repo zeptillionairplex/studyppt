@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - Elo 레이팅 시스템 원리</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: calc(100% - 100px);
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .badge-math {
+            background-color: #ec4899;
+            color: white;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .def {
+            color: #e5c07b;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .type {
+            color: #56b6c2;
+        }
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.15);
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Formula & Concept Box */
+        .concept-box {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+        }
+
+        .concept-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .formula-display {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 15px 0;
+            color: #1e3a8a;
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .scenario-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .scenario-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .scenario-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .scenario-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #334155;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .scenario-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 160px;
+            width: 100%;
+        }
+
+        /* Theme Accents */
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        .accent-purple {
+            border-top: 3px solid #8b5cf6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">Elo 레이팅 시스템 — 핵심 원리</h1>
+                <p class="subtitle">학생 능력치와 문제 난이도의 상호 업데이트 알고리즘</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-chess-knight text-blue-600"></i> Based on Chess Rating System
+                </div>
+            </div>
+        </div>
+        <!-- Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: Expected Score Formula (Concept) -->
+            <div class="concept-box accent-blue" style="grid-row: span 1;">
+                <div class="concept-header">
+                    <i class="fas fa-calculator text-blue-500"></i>
+                    <span>예상 정답률 (Expected Probability)</span>
+                </div>
+                <div class="formula-display">
+                    <p>P = 1 / (1 + 10<sup>(Q - S) / 400</sup>)</p>
+                </div>
+                <div class="text-sm text-slate-600 mb-2">
+                    <p><strong>S (Student):</strong> 학생의 현재 Elo 레이팅</p>
+                    <p><strong>Q (Question):</strong> 문제의 난이도 Elo 레이팅</p>
+                    <p><strong>400:</strong> 10배 확률 차이를 만드는 점수 격차 상수</p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded text-xs text-blue-800 border border-blue-100">
+                    <p><i class="fas fa-info-circle mr-1"></i> 학생 Elo 1200 vs 문제 Elo 1600 → 정답률 약 9%</p>
+                    <p><i class="fas fa-info-circle mr-1"></i> 학생 Elo 1600 vs 문제 Elo 1200 → 정답률 약 91%</p>
+                </div>
+            </div>
+            <!-- Block 2: TypeScript Implementation -->
+            <div class="code-block accent-yellow" style="grid-row: span 2;">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-file-code text-blue-400 file-icon"></i>
+                        <span class="file-name">lib/elo.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="cmt">/**
+                        * 학생이 문제를 맞힐 확률 계산
+                        */</span>
+                    <span class="kwd">function</span> <span class="func">expectedScore</span>(<span
+                        class="prop">studentRating</span>: <span class="type">number</span>, <span
+                        class="prop">questionRating</span>: <span class="type">number</span>): <span
+                        class="type">number</span> {
+                    <span class="kwd">return</span> <span class="num">1</span> / (<span class="num">1</span> +
+                    Math.<span class="func">pow</span>(<span class="num">10</span>, (<span
+                        class="prop">questionRating</span> - <span class="prop">studentRating</span>) / <span
+                        class="num">400</span>));
+                    }
+
+                    <span class="cmt">/**
+                        * 문제 풀이 결과에 따라 양쪽 레이팅 업데이트
+                        * @param K_student 학생 레이팅 변동 계수 (초기 40, 점차 16으로)
+                        * @param K_question 문제 레이팅 변동 계수 (항상 낮게: 4)
+                        */</span>
+                    <span class="kwd">function</span> <span class="func">updateElo</span>(
+                    <span class="prop">studentRating</span>: <span class="type">number</span>,
+                    <span class="prop">questionRating</span>: <span class="type">number</span>,
+                    <span class="prop">isCorrect</span>: <span class="type">boolean</span>,
+                    <span class="prop">K_student</span>: <span class="type">number</span> = <span class="num">32</span>,
+                    <span class="prop">K_question</span>: <span class="type">number</span> = <span class="num">4</span>
+                    ): { <span class="prop">newStudentRating</span>: <span class="type">number</span>; <span
+                        class="prop">newQuestionRating</span>: <span class="type">number</span>; <span
+                        class="prop">expectedScore</span>: <span class="type">number</span> } {
+                    <span class="kwd">const</span> <span class="def">expected</span> = <span
+                        class="func">expectedScore</span>(<span class="prop">studentRating</span>, <span
+                        class="prop">questionRating</span>);
+                    <span class="kwd">const</span> <span class="def">actual</span> = <span class="prop">isCorrect</span>
+                    ? <span class="num">1</span> : <span class="num">0</span>;
+
+                    <span class="highlight-line"><span class="cmt">// 실제 결과와 예상의 차이(actual - expected)만큼
+                            보정</span></span>
+                    <span class="highlight-line"><span class="kwd">return</span> {</span>
+                    <span class="highlight-line"><span class="prop">newStudentRating</span>: <span
+                            class="prop">studentRating</span> + <span class="prop">K_student</span> * (<span
+                            class="def">actual</span> - <span class="def">expected</span>),</span>
+                    <span class="highlight-line"><span class="prop">newQuestionRating</span>: <span
+                            class="prop">questionRating</span> + <span class="prop">K_question</span> * (<span
+                            class="def">expected</span> - <span class="def">actual</span>),</span>
+                    <span class="prop">expectedScore</span>: <span class="def">expected</span>,
+                    };
+                    }
+                </div>
+            </div>
+            <!-- Block 3: Logic Explanation -->
+            <div class="concept-box accent-purple" style="grid-row: span 1;">
+                <div class="concept-header">
+                    <i class="fas fa-balance-scale text-purple-500"></i>
+                    <span>업데이트 로직: "예상 밖일수록 크게 변한다"</span>
+                </div>
+                <ul class="scenario-list">
+                    <li class="scenario-item">
+                        <span class="scenario-title text-green-600"><i class="fas fa-arrow-up mr-1"></i> 학생이 어려운 문제를 맞힘
+                            (Surprise!)</span>
+                        <p class="scenario-desc">예상 정답률 20% → 실제 100% (차이 +0.8)<br />학생 점수 <strong>대폭 상승</strong> (실력
+                            증명)</p>
+                    </li>
+                    <li class="scenario-item">
+                        <span class="scenario-title text-red-600"><i class="fas fa-arrow-down mr-1"></i> 학생이 쉬운 문제를 틀림
+                            (Shock!)</span>
+                        <p class="scenario-desc">예상 정답률 90% → 실제 0% (차이 -0.9)<br />학생 점수 <strong>대폭 하락</strong> (실수 or
+                            개념 부족)</p>
+                    </li>
+                    <li class="scenario-item">
+                        <span class="scenario-title text-gray-600"><i class="fas fa-minus mr-1"></i> 예상대로의 결과
+                            (Expected)</span>
+                        <p class="scenario-desc">비슷한 난이도(50%)를 맞히거나 틀림<br />점수 <strong>소폭 변동</strong> (현상 유지)</p>
+                    </li>
+                </ul>
+            </div>
+            <!-- Block 4: Visualization Chart -->
+            <div class="concept-box accent-green"
+                style="grid-row: span 1; display: flex; flex-direction: column; justify-content: center;">
+                <div class="concept-header">
+                    <i class="fas fa-chart-line text-green-500"></i>
+                    <span>확률 분포 곡선 (Logistic Curve)</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="eloChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Simple Chart.js rendering for the probability curve
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('eloChart').getContext('2d');
+
+            // Data points for Logistic Curve
+            const labels = [-800, -600, -400, -200, 0, 200, 400, 600, 800];
+            const dataPoints = labels.map(diff => 1 / (1 + Math.pow(10, diff / 400)));
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '정답 확률 (P)',
+                        data: dataPoints,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#10b981',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return '확률: ' + (context.raw * 100).toFixed(1) + '%';
+                                },
+                                title: function (context) {
+                                    return '난이도 차이 (Q-S): ' + context.label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1.0,
+                            ticks: {
+                                callback: function (value) { return (value * 100) + '%' },
+                                font: { size: 10 }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '난이도 차이 (문제 - 학생)',
+                                font: { size: 10 }
+                            },
+                            grid: { display: false },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

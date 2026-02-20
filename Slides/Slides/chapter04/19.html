@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 최종 아키텍처 선택</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #f8fafc;
+            /* Removed gradient as requested, using solid color */
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            right: 50px;
+            height: 80px;
+            border-bottom: 2px solid #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 15px;
+            z-index: 20;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Top Section: Reasoning */
+        .reasoning-area {
+            position: absolute;
+            top: 140px;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            gap: 20px;
+            height: 100px;
+        }
+
+        .reason-card {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .reason-card.rejected {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+            opacity: 0.7;
+        }
+
+        .reason-card.selected {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+
+        .reason-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reason-desc {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* Diagram Area */
+        .diagram-area {
+            position: absolute;
+            top: 260px;
+            left: 0;
+            width: 100%;
+            height: 340px;
+            z-index: 10;
+        }
+
+        /* SVG Connections */
+        .connections-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .conn-line {
+            fill: none;
+            stroke: #94a3b8;
+            stroke-width: 2;
+        }
+
+        .conn-line.active {
+            stroke: #3b82f6;
+            stroke-width: 3;
+        }
+
+        .conn-line.stale {
+            stroke: #f59e0b;
+            stroke-width: 2;
+            stroke-dasharray: 4;
+        }
+
+        /* Entity Nodes */
+        .entity-node {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 220px;
+            padding: 0;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .entity-header {
+            padding: 8px 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entity-body {
+            padding: 10px;
+            font-size: 12px;
+            color: #334155;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Philosophy Box */
+        .philosophy-box {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            right: 50px;
+            height: 80px;
+            background: #1e293b;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            color: white;
+            gap: 40px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .phil-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .phil-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #60a5fa;
+        }
+
+        .phil-text h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .phil-text p {
+            margin: 2px 0 0 0;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-stale {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fcd34d;
+        }
+
+        .badge-fresh {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #6ee7b7;
+        }
+
+        .badge-current {
+            background: #dbeafe;
+            color: #2563eb;
+            border: 1px solid #93c5fd;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">최종 선택 — 패턴 B + 버전 관리</h1>
+                <p class="subtitle">원문은 Master, 파생물은 Cache. 파생물은 특정 원문 버전에 귀속된다.</p>
+            </div>
+            <div class="text-right">
+                <div class="text-blue-700 font-bold text-lg"><i class="fas fa-check-circle mr-2"></i>Pattern B Selected
+                </div>
+                <div class="text-slate-400 text-sm">Hybrid Approach</div>
+            </div>
+        </div>
+        <!-- Reasoning Section -->
+        <div class="reasoning-area">
+            <div class="reason-card rejected">
+                <div class="reason-title text-slate-500"><i class="fas fa-times-circle"></i> 패턴 A (런타임 생성)</div>
+                <div class="reason-desc">
+                    <p>• <strong>탈락 사유:</strong> AI 생성 결과의 재현성 보장 불가</p>
+                    <p>• 검수 완료된 문제가 조회할 때마다 달라질 위험</p>
+                </div>
+            </div>
+            <div class="reason-card rejected">
+                <div class="reason-title text-slate-500"><i class="fas fa-times-circle"></i> 패턴 C (완전 분리)</div>
+                <div class="reason-desc">
+                    <p>• <strong>탈락 사유:</strong> 원문 수정 사항이 파생물에 반영 안 됨</p>
+                    <p>• "원문이 진실(SSOT)"이라는 대원칙 위배</p>
+                </div>
+            </div>
+            <div class="reason-card selected">
+                <div class="reason-title text-blue-600"><i class="fas fa-check-circle"></i> 패턴 B (캐시 + 버전관리)</div>
+                <div class="reason-desc">
+                    <p>• <strong>최종 선택:</strong> 일관성, 성능, 재현성의 균형</p>
+                    <p>• 원문 변경 시 <code>is_stale</code> 마킹 후 선택적 재생성</p>
+                </div>
+            </div>
+        </div>
+        <!-- Diagram Area -->
+        <div class="diagram-area">
+            <!-- SVG Connections -->
+            <svg class="connections-layer">
+                <defs>
+                    <marker id="arrow-blue" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="5">
+                        <path d="M2,2 L8,5 L2,8 L2,2" fill="#3b82f6"></path>
+                    </marker>
+                    <marker id="arrow-stale" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="5">
+                        <path d="M2,2 L8,5 L2,8 L2,2" fill="#d97706"></path>
+                    </marker>
+                </defs>
+                <!-- Doc to V1 -->
+                <path class="conn-line" d="M 220 160 C 270 160, 270 60, 320 60" marker-end="url(#arrow-blue)"></path>
+                <!-- Doc to V2 -->
+                <path class="conn-line" d="M 220 160 L 320 160" marker-end="url(#arrow-blue)"></path>
+                <!-- Doc to V3 -->
+                <path class="conn-line active" d="M 220 160 C 270 160, 270 260, 320 260" marker-end="url(#arrow-blue)">
+                </path>
+                <!-- V1 to Quiz A -->
+                <path class="conn-line stale" d="M 540 60 L 640 60" marker-end="url(#arrow-stale)"></path>
+                <!-- V2 to Quiz B -->
+                <path class="conn-line stale" d="M 540 160 L 640 160" marker-end="url(#arrow-stale)"></path>
+                <!-- V3 to Quiz C -->
+                <path class="conn-line active" d="M 540 260 L 640 260" marker-end="url(#arrow-blue)"></path>
+            </svg>
+            <!-- 1. Documents (Root) -->
+            <div class="entity-node" style="top: 120px; left: 0px; border: 1px solid #3b82f6;">
+                <div class="entity-header bg-blue-600">
+                    <i class="fas fa-file-alt"></i> documents (Master)
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>id:</span> <span class="font-bold">doc-101</span>
+                    </div>
+                    <div>Latest: v3</div>
+                </div>
+            </div>
+            <!-- 2. Versions (Branches) -->
+            <!-- V1 -->
+            <div class="entity-node" style="top: 20px; left: 320px; border: 1px solid #cbd5e1; opacity: 0.8;">
+                <div class="entity-header bg-slate-500">
+                    <i class="fas fa-code-branch"></i> version (v1)
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>ver:</span> <span>1</span>
+                    </div>
+                    <div class="text-xs text-slate-500">Created: 2023-01-01</div>
+                </div>
+            </div>
+            <!-- V2 -->
+            <div class="entity-node" style="top: 120px; left: 320px; border: 1px solid #cbd5e1; opacity: 0.8;">
+                <div class="entity-header bg-slate-500">
+                    <i class="fas fa-code-branch"></i> version (v2)
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>ver:</span> <span>2</span>
+                    </div>
+                    <div class="text-xs text-slate-500">Created: 2023-01-05</div>
+                </div>
+            </div>
+            <!-- V3 (Current) -->
+            <div class="entity-node" style="top: 220px; left: 320px; border: 1px solid #3b82f6;">
+                <div class="entity-header bg-blue-500">
+                    <i class="fas fa-code-branch"></i> version (v3)
+                    <span class="ml-auto badge badge-current">Current</span>
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>ver:</span> <span>3</span>
+                    </div>
+                    <div class="text-xs text-blue-600">Created: 2023-01-10</div>
+                </div>
+            </div>
+            <!-- 3. Quiz Sets (Leaves) -->
+            <!-- Quiz A (Stale) -->
+            <div class="entity-node" style="top: 20px; left: 640px; border: 1px solid #f59e0b;">
+                <div class="entity-header bg-amber-500">
+                    <i class="fas fa-layer-group"></i> quiz_sets (A)
+                    <span class="ml-auto badge badge-stale">Stale</span>
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>src_ver:</span> <span class="text-amber-600">v1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>stale:</span> <span class="text-red-500 font-bold">true</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Quiz B (Stale) -->
+            <div class="entity-node" style="top: 120px; left: 640px; border: 1px solid #f59e0b;">
+                <div class="entity-header bg-amber-500">
+                    <i class="fas fa-layer-group"></i> quiz_sets (B)
+                    <span class="ml-auto badge badge-stale">Stale</span>
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>src_ver:</span> <span class="text-amber-600">v2</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>stale:</span> <span class="text-red-500 font-bold">true</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Quiz C (Fresh) -->
+            <div class="entity-node" style="top: 220px; left: 640px; border: 1px solid #10b981;">
+                <div class="entity-header bg-emerald-600">
+                    <i class="fas fa-layer-group"></i> quiz_sets (C)
+                    <span class="ml-auto badge badge-fresh">Fresh</span>
+                </div>
+                <div class="entity-body">
+                    <div class="flex justify-between mb-1">
+                        <span>src_ver:</span> <span class="text-emerald-600 font-bold">v3</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>stale:</span> <span class="text-slate-400">false</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Flow Labels -->
+            <div class="absolute" style="top: 20px; left: 240px; font-size: 11px; color: #94a3b8;">Has Versions</div>
+            <div class="absolute" style="top: 20px; left: 560px; font-size: 11px; color: #94a3b8;">Bound To</div>
+        </div>
+        <!-- Philosophy Box -->
+        <div class="philosophy-box">
+            <div class="phil-item">
+                <div class="phil-icon"><i class="fas fa-history"></i></div>
+                <div class="phil-text">
+                    <h4>Event Sourcing Philosophy</h4>
+                    <p>문서의 버전 히스토리가 곧 '진실(Truth)'이며, 변경 불가능(Immutable)한 이벤트로 관리됨</p>
+                </div>
+            </div>
+            <div class="h-10 w-px bg-slate-600"></div>
+            <div class="phil-item">
+                <div class="phil-icon"><i class="fas fa-glasses"></i></div>
+                <div class="phil-text">
+                    <h4>CQRS Pattern</h4>
+                    <p>파생된 문제 세트(Quiz Sets)는 빠르게 조회하기 위한 Read Model(캐시)로 취급됨</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

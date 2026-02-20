@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 핵심 DB 스키마</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout - Modified for 3 blocks */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1.2fr 0.8fr;
+            /* Top row taller for core tables */
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+            min-height: 0;
+            /* Prevent overflow issues */
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .span-col-2 {
+            grid-column: span 2;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-sql {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow-y: auto;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting (PostgreSQL style) */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* CREATE, TABLE, etc. */
+        .type {
+            color: #e5c07b;
+        }
+
+        /* UUID, VARCHAR, JSONB */
+        .prop {
+            color: #e06c75;
+        }
+
+        /* Column names */
+        .str {
+            color: #98c379;
+        }
+
+        /* Strings */
+        .num {
+            color: #d19a66;
+        }
+
+        /* Numbers */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* Comments */
+        .func {
+            color: #61afef;
+        }
+
+        /* Functions like NOW(), gen_random_uuid() */
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.15);
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Theme Accents */
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        /* Scrollbar styling */
+        .code-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .code-content::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .code-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .code-content::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">핵심 DB 스키마 — PostgreSQL</h1>
+                <p class="subtitle">Single Source of Truth와 파생물 격리를 위한 테이블 설계</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-database text-blue-600"></i> PostgreSQL 15+
+                </div>
+            </div>
+        </div>
+        <!-- Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: Core Content -->
+            <div class="code-block accent-yellow">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-book text-yellow-400 file-icon"></i>
+                        <span class="file-name">1. 원문 관리 (Core)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> documents (
+                    <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="prop">is_archived</span> <span class="type">BOOLEAN DEFAULT FALSE</span>, <span
+                        class="cmt">-- Soft Delete</span>
+                    <span class="prop">delete_scheduled_at</span> <span class="type">TIMESTAMPTZ</span> <span
+                        class="cmt">-- 30일 후 삭제</span>
+                    );
+
+                    <span class="kwd">CREATE TABLE</span> document_versions (
+                    <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY</span>,
+                    <span class="prop">document_id</span> <span class="type">UUID REFERENCES</span> documents(id),
+                    <span class="prop">version_number</span> <span class="type">INTEGER NOT NULL</span>,
+                    <span class="highlight-line"><span class="prop">content_json</span> <span class="type">JSONB NOT
+                            NULL</span>, <span class="cmt">-- TipTap JSON (SSOT)</span></span> <span
+                        class="kwd">UNIQUE</span>(document_id, version_number)
+                    );
+
+                    <span class="kwd">CREATE TABLE</span> document_annotations (
+                    <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY</span>,
+                    <span class="prop">version_id</span> <span class="type">UUID REFERENCES</span>
+                    document_versions(id),
+                    <span class="prop">mark_type</span> <span class="type">VARCHAR</span>(<span class="num">50</span>),
+                    <span class="cmt">-- 'blankTarget', 'quizZone'</span>
+                    <span class="prop">attributes</span> <span class="type">JSONB</span>, <span class="cmt">--
+                        {difficulty: 'easy'}</span>
+                    <span class="prop">text_content</span> <span class="type">TEXT</span> <span class="cmt">-- 검색용 텍스트
+                        평탄화</span>
+                    );
+                </div>
+            </div>
+            <!-- Block 2: Derived Content -->
+            <div class="code-block accent-blue">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-layer-group text-blue-400 file-icon"></i>
+                        <span class="file-name">2. 파생 콘텐츠 (Derived)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> quiz_sets (
+                    <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY</span>,
+                    <span class="prop">document_id</span> <span class="type">UUID REFERENCES</span> documents(id),
+                    <span class="highlight-line"><span class="prop">source_version_id</span> <span class="type">UUID
+                            REFERENCES</span> document_versions(id),</span> <span class="prop">is_stale</span> <span
+                        class="type">BOOLEAN DEFAULT FALSE</span> <span class="cmt">-- 캐시 무효화 플래그</span>
+                    );
+
+                    <span class="kwd">CREATE TABLE</span> quiz_questions (
+                    <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY</span>,
+                    <span class="prop">quiz_set_id</span> <span class="type">UUID REFERENCES</span> quiz_sets(id),
+                    <span class="prop">source_annotation_id</span> <span class="type">UUID</span>,
+                    <span class="prop">status</span> <span class="type">VARCHAR</span>(<span class="num">20</span>)
+                    <span class="kwd">DEFAULT</span> <span class="str">'draft'</span>,
+                    <span class="highlight-line"><span class="prop">original_text_snapshot</span> <span
+                            class="type">TEXT</span>, <span class="cmt">-- 원문 삭제 대비 안전장치</span></span> <span
+                        class="prop">elo_rating</span> <span class="type">FLOAT DEFAULT</span> <span
+                        class="num">1200.0</span>
+                    );
+
+                    <span class="kwd">CREATE TABLE</span> fill_blank_items (
+                    <span class="prop">question_id</span> <span class="type">UUID REFERENCES</span> quiz_questions(id),
+                    <span class="prop">full_sentence</span> <span class="type">TEXT</span>,
+                    <span class="prop">blanks</span> <span class="type">JSONB</span> <span class="cmt">-- [{"pos":0,
+                        "ans":"이산화탄소"}]</span>
+                    );
+                </div>
+            </div>
+            <!-- Block 3: Sync & Log (Spanning Bottom) -->
+            <div class="code-block accent-green span-col-2">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-sync-alt text-green-400 file-icon"></i>
+                        <span class="file-name">3. 동기화 및 상태 관리 (Sync &amp; Logs)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content" style="display: flex; gap: 20px;">
+                    <div style="flex: 1;">
+                        <span class="cmt">-- 원문 변경 영향 추적 (Cascade Control)</span>
+                        <span class="kwd">CREATE TABLE</span> derivation_log (
+                        <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY
+                            KEY</span>,
+                        <span class="prop">document_id</span> <span class="type">UUID</span>,
+                        <span class="prop">old_version_id</span> <span class="type">UUID</span>,
+                        <span class="prop">new_version_id</span> <span class="type">UUID</span>,
+                        <span class="highlight-line"><span class="prop">affected_quiz_sets</span> <span
+                                class="type">UUID[]</span>, <span class="cmt">-- 영향받은 퀴즈 세트 배열</span></span> <span
+                            class="prop">action_taken</span> <span class="type">VARCHAR</span>(<span
+                            class="num">50</span>), <span class="cmt">-- 'marked_stale', 'regenerated'</span>
+                        <span class="prop">created_at</span> <span class="type">TIMESTAMPTZ DEFAULT NOW</span>()
+                        );
+                    </div>
+                    <div style="border-left: 1px solid #334155; padding-left: 20px; flex: 1;">
+                        <span class="cmt">-- AI 생성 이력 및 비용 추적</span>
+                        <span class="kwd">CREATE TABLE</span> question_generation_log (
+                        <span class="prop">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY
+                            KEY</span>,
+                        <span class="prop">quiz_question_id</span> <span class="type">UUID REFERENCES</span>
+                        quiz_questions(id),
+                        <span class="prop">model_used</span> <span class="type">VARCHAR</span>(<span
+                            class="num">100</span>), <span class="cmt">-- 'gemini-flash', 'claude-sonnet'</span>
+                        <span class="prop">input_tokens</span> <span class="type">INTEGER</span>,
+                        <span class="prop">output_tokens</span> <span class="type">INTEGER</span>,
+                        <span class="prop">cost_usd</span> <span class="type">DECIMAL</span>(<span
+                            class="num">10</span>,<span class="num">6</span>), <span class="cmt">-- 실제 비용 ($)</span>
+                        <span class="prop">prompt_hash</span> <span class="type">VARCHAR</span>(<span
+                            class="num">64</span>) <span class="cmt">-- 프롬프트 버전 관리</span>
+                        );
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

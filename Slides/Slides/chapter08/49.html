@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 버전 관리 필요성</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #ffffff;
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+
+        .circle-1 {
+            width: 600px;
+            height: 600px;
+            background-color: #3b82f6;
+            top: -200px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background-color: #1e40af;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 10;
+            padding: 40px 80px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+            align-self: flex-start;
+        }
+
+        .main-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 3.5rem;
+            color: #1e3a8a;
+            line-height: 1.1;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+        }
+
+        .sub-title {
+            font-size: 1.5rem;
+            color: #64748b;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+
+        .quote-box {
+            position: relative;
+            background-color: #eff6ff;
+            padding: 1.5rem 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px -3px rgba(59, 130, 246, 0.1);
+            max-width: 1000px;
+            border-left: 6px solid #3b82f6;
+            margin-bottom: 2.5rem;
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: -15px;
+            left: 15px;
+            background-color: #3b82f6;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .quote-text {
+            font-size: 1.25rem;
+            color: #1e40af;
+            font-weight: 700;
+            line-height: 1.4;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .scenarios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: #93c5fd;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+        }
+
+        .scenario-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #dbeafe;
+            color: #2563eb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .scenario-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .scenario-desc {
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .scenario-action {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Decorative Background Elements -->
+        <div class="decorative-circle circle-1"></div>
+        <div class="decorative-circle circle-2"></div>
+        <div class="content-wrapper">
+            <!-- Logo / Brand Area -->
+            <div class="logo-area">
+                <i class="fas fa-code-branch fa-lg"></i>
+                <span style="font-size: 1.2rem; font-weight: 700;">Chapter 8. 버전 관리</span>
+            </div>
+            <!-- Main Title -->
+            <p class="main-title">교육 콘텐츠에 버전 관리가 필수인 이유</p>
+            <p class="sub-title">"실수 복구부터 교육과정 변경 대응까지, 원문의 역사를 기록하다"</p>
+            <!-- Key Message Quote -->
+            <div class="quote-box">
+                <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="quote-text">
+                    "선생님이 원문을 고칠 때마다 '3일 전이 더 나았는데...'가 가능해야 하고,<br />
+                    이미 만든 문제가 어떤 원문 버전에서 나왔는지 추적 가능해야 합니다."
+                </p>
+            </div>
+            <!-- Scenarios Grid -->
+            <div class="scenarios-grid">
+                <!-- Scenario 1 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <p class="scenario-title">시나리오 1: 실수 복구</p>
+                    <p class="scenario-desc">
+                        선생님이 원문을 대폭 수정했지만, 다음 날 보니 이전 내용이 더 나았던 경우.
+                    </p>
+                    <div class="scenario-action">
+                        <i class="fas fa-arrow-right"></i> "v3으로 롤백" 즉시 복구
+                    </div>
+                </div>
+                <!-- Scenario 2 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon">
+                        <i class="fas fa-search-location"></i>
+                    </div>
+                    <p class="scenario-title">시나리오 2: 파생물 추적</p>
+                    <p class="scenario-desc">
+                        학생이 문제 오류를 신고했을 때, 해당 문제가 어떤 원문 버전에서 생성됐는지 확인.
+                    </p>
+                    <div class="scenario-action">
+                        <i class="fas fa-arrow-right"></i> 원인 파악 및 선택적 수정
+                    </div>
+                </div>
+                <!-- Scenario 3 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <p class="scenario-title">시나리오 3: 교육과정 변경</p>
+                    <p class="scenario-desc">
+                        용어 변경 등 개정에 맞춰 새 버전을 만들되, 기존 시험 기록을 위해 구 버전도 유지.
+                    </p>
+                    <div class="scenario-action">
+                        <i class="fas fa-arrow-right"></i> 과거/현재 버전 공존
+                    </div>
+                </div>
+                <!-- Scenario 4 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon">
+                        <i class="fas fa-code-fork"></i>
+                    </div>
+                    <p class="scenario-title">시나리오 4: 변형 관리</p>
+                    <p class="scenario-desc">
+                        같은 원문으로 '중간고사용'과 '수능 대비용' 등 목적별로 다른 버전을 관리.
+                    </p>
+                    <div class="scenario-action">
+                        <i class="fas fa-arrow-right"></i> 브랜치로 독립적 관리
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

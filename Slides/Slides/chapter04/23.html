@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 선생님 탈퇴/삭제 시나리오</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area (Lifecycle) */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 110px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 180px;
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-active {
+            background-color: #10b981;
+        }
+
+        .icon-wait {
+            background-color: #f59e0b;
+        }
+
+        .icon-anon {
+            background-color: #64748b;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 5px;
+            white-space: nowrap;
+        }
+
+        /* 2. Policy Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .db-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scenario-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            width: 100px;
+            text-align: center;
+        }
+
+        .sc-delete {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .sc-leave {
+            background-color: #ffedd5;
+            color: #c2410c;
+        }
+
+        .sc-gdpr {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .sc-deriv {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .method-code {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #0f172a;
+            font-size: 0.8rem;
+        }
+
+        /* 3. Code & Principle Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .principle-panel {
+            flex: 1;
+            background-color: #eff6ff;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .code-panel .panel-header {
+            background-color: #0f172a;
+            border-bottom: 1px solid #334155;
+        }
+
+        .principle-panel .panel-header {
+            background-color: #dbeafe;
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .panel-label {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .code-panel .panel-label {
+            color: #cbd5e1;
+        }
+
+        .principle-panel .panel-label {
+            color: #1e40af;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-sql {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .tag-policy {
+            background-color: #1e40af;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        .principle-body {
+            flex: 1;
+            padding: 20px;
+            color: #1e3a8a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Syntax Highlight */
+        .sql-kwd {
+            color: #61afef;
+            font-weight: bold;
+        }
+
+        .sql-type {
+            color: #e5c07b;
+        }
+
+        .sql-cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .highlight-box {
+            background-color: white;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 10px;
+        }
+
+        .highlight-title {
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .highlight-text {
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.4;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">선생님 탈퇴/삭제 시나리오</h1>
+                <p class="subtitle">보존·익명화·법적 대응을 위한 데이터 생명주기(Lifecycle) 관리 전략</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-user-shield mr-2"></i> Data Governance
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Flow Diagram (Lifecycle) -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-history text-blue-500"></i> User Lifecycle Flow
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-active">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="step-title">Active User</div>
+                        <div class="step-desc">정상 활동 상태</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">탈퇴 요청 (Soft Delete)</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-wait">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="step-title">Grace Period</div>
+                        <div class="step-desc">30일 유예 (복구 가능)</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">기간 만료 (Hard Delete)</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-anon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <div class="step-title">Anonymization</div>
+                        <div class="step-desc">개인정보 파기 + 콘텐츠 보존</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Policy Table -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-clipboard-list text-green-600"></i> Policy Matrix
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">시나리오 (Scenario)</th>
+                                <th style="width: 35%">처리 정책 (Policy)</th>
+                                <th style="width: 45%">구현 방법 (Implementation)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="scenario-badge sc-delete">원문 삭제</span></td>
+                                <td>Soft Delete 후 30일 대기, 이후 완전 삭제</td>
+                                <td><span class="method-code">is_archived = true</span> 설정, 스케줄러가 30일 후 정리</td>
+                            </tr>
+                            <tr>
+                                <td><span class="scenario-badge sc-leave">사용자 탈퇴</span></td>
+                                <td>개인정보 즉시 파기, 콘텐츠는 익명화 보존</td>
+                                <td><span class="method-code">created_by = NULL</span> 또는 <span
+                                        class="method-code">system_user</span>로 소유권 이전</td>
+                            </tr>
+                            <tr>
+                                <td><span class="scenario-badge sc-gdpr">GDPR 삭제</span></td>
+                                <td>식별자(이름, 이메일) 영구 삭제</td>
+                                <td><span class="method-code">DELETE FROM users</span> (Cascade Set Null 적용)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="scenario-badge sc-deriv">배포 후 삭제</span></td>
+                                <td>파생물(문제)은 독립적으로 계속 동작</td>
+                                <td>문제 테이블의 <span class="method-code">original_text_snapshot</span> 필드 활용</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Implementation & Principle -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> SCHEMA &amp; PRINCIPLES
+                </div>
+                <div class="code-container">
+                    <!-- Left: SQL Schema -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-database text-blue-400"></i> Schema Update
+                            </div>
+                            <span class="lang-tag tag-sql">SQL</span>
+                        </div>
+                        <div class="code-body"><span class="sql-kwd">ALTER TABLE</span> users
+                            <span class="sql-kwd">ADD COLUMN</span> is_deactivated <span class="sql-type">BOOLEAN</span>
+                            <span class="sql-kwd">DEFAULT</span> FALSE,
+                            <span class="sql-kwd">ADD COLUMN</span> retention_until <span
+                                class="sql-type">TIMESTAMPTZ</span>; <span class="sql-cmt">-- 30일 후 삭제일</span>
+                            <span class="sql-kwd">CREATE TABLE</span> content_ownership_log (
+                            id <span class="sql-type">UUID</span> <span class="sql-kwd">PRIMARY KEY</span>,
+                            document_id <span class="sql-type">UUID</span> <span class="sql-kwd">REFERENCES</span>
+                            documents(id),
+                            prev_owner_id <span class="sql-type">UUID</span>, <span class="sql-cmt">-- 탈퇴한 사용자</span>
+                            new_owner_id <span class="sql-type">UUID</span>, <span class="sql-cmt">-- 시스템/익명 계정</span>
+                            reason <span class="sql-type">VARCHAR</span>(50), <span class="sql-cmt">--
+                                'USER_WITHDRAWAL'</span>
+                            transferred_at <span class="sql-type">TIMESTAMPTZ</span> <span
+                                class="sql-kwd">DEFAULT</span> NOW()
+                            );
+                        </div>
+                    </div>
+                    <!-- Right: Principle Emphasis -->
+                    <div class="principle-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-balance-scale text-blue-600"></i> Core Principle
+                            </div>
+                            <span class="lang-tag tag-policy">POLICY</span>
+                        </div>
+                        <div class="principle-body">
+                            <div class="highlight-box">
+                                <p class="highlight-title"><i class="fas fa-user-slash mr-2"></i> 개인정보와 콘텐츠의 분리</p>
+                                <p class="highlight-text">
+                                    사용자 식별 정보(PII)는 요청 시 <strong>지체 없이 파기</strong>되어야 하지만,
+                                    작성된 교육 콘텐츠는 '공용 자산'의 성격을 띠므로 <strong>익명화하여 보존</strong>합니다.
+                                </p>
+                            </div>
+                            <div class="highlight-box" style="border-left-color: #10b981; margin-bottom: 0;">
+                                <p class="highlight-title" style="color: #047857;"><i
+                                        class="fas fa-shield-alt mr-2"></i> 학습 데이터 무결성 보장</p>
+                                <p class="highlight-text">
+                                    이미 학생에게 제공된 문제가 원작자 탈퇴로 인해 사라지면
+                                    <strong>학생의 학습 이력(오답 노트, 성취도)이 훼손</strong>되므로, 콘텐츠 보존은 필수적입니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

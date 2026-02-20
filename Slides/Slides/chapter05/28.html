@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 시스템 프롬프트 실전 예시</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-system {
+            background-color: #ec4899;
+            color: white;
+        }
+
+        /* Pink */
+        .badge-rules {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* Blue */
+        .badge-check {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        /* Yellow */
+        .badge-shot {
+            background-color: #10b981;
+            color: white;
+        }
+
+        /* Green */
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            /* Adjusted for dense content */
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting (Markdown/Prompt style) */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* keyword/header */
+        .def {
+            color: #e5c07b;
+        }
+
+        /* definition */
+        .str {
+            color: #98c379;
+        }
+
+        /* string */
+        .num {
+            color: #d19a66;
+        }
+
+        /* number */
+        .prop {
+            color: #e06c75;
+        }
+
+        /* property */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* comment */
+        .json-key {
+            color: #61afef;
+        }
+
+        /* JSON key */
+        .json-val {
+            color: #98c379;
+        }
+
+        /* JSON value */
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(220, 38, 38, 0.25);
+            /* Red tint for strict rules */
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #ef4444;
+            color: #fca5a5;
+            font-weight: bold;
+        }
+
+        /* Theme Accents */
+        .accent-pink {
+            border-top: 3px solid #ec4899;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        /* Scrollbar for code */
+        .code-content::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .code-content::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        .code-content::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">시스템 프롬프트 실전 예시 — 빈칸 채우기(발췌)</h1>
+                <p class="subtitle">저가 모델(Gemini Flash)에서도 고품질을 보장하는 180줄 프롬프트 구조</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-robot text-pink-500"></i> System Prompt v2.1
+                </div>
+            </div>
+        </div>
+        <!-- 2x2 Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: Role & Schema -->
+            <div class="code-block accent-pink">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-id-card text-pink-400 file-icon"></i>
+                        <span class="file-name">1. 역할 정의 및 스키마</span>
+                    </div>
+                    <span class="lang-badge badge-system">Structure</span>
+                </div>
+                <div class="code-content"><span class="kwd"># SYSTEM PROMPT: EduContent CMS — 빈칸 채우기 문제 생성기 v2.1</span>
+                    <span class="kwd">## 1. 역할 정의</span>
+                    당신은 대한민국의 숙련된 교과 출제 전문가입니다.
+                    주어진 원문 텍스트와 태깅 정보를 기반으로 교육적으로 의미 있는
+                    빈칸 채우기(Cloze) 문제를 생성합니다.
+
+                    <span class="kwd">## 3. 출력 형식 (엄격히 준수)</span>
+                    <div class="highlight-line">반드시 다음 JSON 구조로만 응답하세요. JSON 외의 텍스트는 절대 포함하지 마세요:</div>{
+                    <span class="json-key">"quiz_set"</span>: {
+                    <span class="json-key">"title"</span>: <span class="json-val">"빈칸 채우기 - [주제 요약]"</span>,
+                    <span class="json-key">"questions"</span>: [
+                    {
+                    <span class="json-key">"id"</span>: <span class="json-val">"q_001"</span>,
+                    <span class="json-key">"source_annotation_id"</span>: <span class="json-val">"ann_001"</span>,
+                    <span class="json-key">"question_text"</span>: <span class="json-val">"빈칸이 포함된 문장. ______
+                        표시."</span>,
+                    <span class="json-key">"acceptable_answers"</span>: [<span class="json-val">"정답"</span>, <span
+                        class="json-val">"동의어"</span>],
+                    <span class="json-key">"explanation"</span>: <span class="json-val">"정답 이유 (2~3문장)"</span>
+                    }
+                    ]
+                    }
+                    }
+                </div>
+            </div>
+            <!-- Block 2: Generation Rules -->
+            <div class="code-block accent-blue">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-ruler-combined text-blue-400 file-icon"></i>
+                        <span class="file-name">2. 생성 규칙 (Generation Rules)</span>
+                    </div>
+                    <span class="lang-badge badge-rules">Logic</span>
+                </div>
+                <div class="code-content"><span class="kwd">## 4. 문제 생성 규칙</span>
+                    <span class="kwd">### 4-1. 빈칸 선정 원칙</span>
+                    - <span class="def">태깅된 텍스트(annotations)</span>를 우선적으로 빈칸으로 사용합니다.
+                    - 빈칸은 반드시 문맥에서 유일하게 결정 가능한 단어/구여야 합니다.
+                    - 하나의 문장에 빈칸은 최대 2개까지만 허용합니다.
+                    - 조사("은/는/이/가")는 빈칸에 포함하지 않습니다.
+
+                    <span class="kwd">### 4-2. 난이도 조절</span>
+                    - <span class="prop">easy</span>: 원문을 읽으면 바로 찾을 수 있는 직접적 사실
+                    - <span class="prop">medium</span>: 문맥을 이해해야 추론 가능한 핵심 개념
+                    - <span class="prop">hard</span>: 여러 문단의 정보를 종합해야 답할 수 있는 심화 문제
+
+                    <span class="kwd">### 4-3. 오답/혼동 방지 (Acceptable Answers)</span>
+                    - 정답과 동일한 의미를 가진 표현을 2개 이상 포함하세요.
+                    - 예: <span class="str">"광합성"</span> → [<span class="str">"광합성"</span>, <span
+                        class="str">"光合成"</span>, <span class="str">"photosynthesis"</span>]
+                    - 예: <span class="str">"100km"</span> → [<span class="str">"100km"</span>, <span class="str">"100
+                        km"</span>, <span class="str">"100 킬로미터"</span>]
+                </div>
+            </div>
+            <!-- Block 3: Checklist & Bans -->
+            <div class="code-block accent-yellow">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-check-double text-yellow-400 file-icon"></i>
+                        <span class="file-name">3. 검증 및 금지사항</span>
+                    </div>
+                    <span class="lang-badge badge-check">Verify</span>
+                </div>
+                <div class="code-content"><span class="kwd">## 5. 품질 검증 체크리스트 (자기 검증)</span>
+                    □ 모든 정답이 원문에서 실제로 확인 가능한가?
+                    □ 빈칸이 문맥상 유일하게 결정되는가?
+                    □ 힌트가 난이도에 맞게 제공되었는가? (Easy=초성, Hard=없음)
+                    □ JSON 구조가 위 형식과 정확히 일치하는가?
+
+                    <span class="kwd">## 6. 금지 사항</span>
+                    - <span class="prop">Hallucination</span>: 원문에 없는 내용을 지어내지 마세요.
+                    - 정답이 2음절 이하인 경우, 반드시 힌트를 제공하세요.
+                    - JSON 파싱을 방해하는 주석(//)이나 마크다운(```)을 포함하지 마세요.
+                    - 학생에게 혼란을 줄 수 있는 중의적인 문장을 피하세요.
+                    - 교육과정 수준(Grade Level)을 벗어나는 용어 사용을 금지합니다.
+                </div>
+            </div>
+            <!-- Block 4: Few-shot Examples -->
+            <div class="code-block accent-green">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-code text-green-400 file-icon"></i>
+                        <span class="file-name">4. Few-shot Examples</span>
+                    </div>
+                    <span class="lang-badge badge-shot">Example</span>
+                </div>
+                <div class="code-content"><span class="kwd">## 7. 예시 (Few-shot)</span>
+                    <span class="cmt">[입력 예시]</span>
+                    {
+                    <span class="json-key">"source_text"</span>: <span class="json-val">"광합성은 엽록체에서 일어난다..."</span>,
+                    <span class="json-key">"annotations"</span>: [{<span class="json-key">"text"</span>: <span
+                        class="json-val">"엽록체"</span>, <span class="json-key">"type"</span>: <span
+                        class="json-val">"blankTarget"</span>}]
+                    }
+
+                    <span class="cmt">[출력 예시]</span>
+                    {
+                    <span class="json-key">"quiz_set"</span>: {
+                    <span class="json-key">"questions"</span>: [
+                    {
+                    <span class="json-key">"question_text"</span>: <span class="json-val">"광합성은 식물 세포의 ______에서
+                        일어난다."</span>,
+                    <span class="json-key">"answer"</span>: <span class="json-val">"엽록체"</span>,
+                    <span class="json-key">"acceptable_answers"</span>: [<span class="json-val">"엽록체"</span>, <span
+                        class="json-val">"chloroplast"</span>],
+                    <span class="json-key">"hint"</span>: <span class="json-val">"ㅇㄹㅊ, 세포 소기관"</span>,
+                    <span class="json-key">"explanation"</span>: <span class="json-val">"광합성은 엽록체의 틸라코이드 막과..."</span>
+                    }
+                    ]
+                    }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

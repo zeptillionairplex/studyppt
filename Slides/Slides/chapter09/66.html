@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 학생 적응형 학습 DB 스키마</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-sql {
+            background-color: #f29111;
+            color: white;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            /* Slightly smaller for SQL */
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* keyword */
+        .def {
+            color: #e5c07b;
+        }
+
+        /* definition */
+        .str {
+            color: #98c379;
+        }
+
+        /* string */
+        .num {
+            color: #d19a66;
+        }
+
+        /* number */
+        .type {
+            color: #56b6c2;
+        }
+
+        /* type */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* comment */
+        .func {
+            color: #61afef;
+        }
+
+        /* function */
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.2);
+            /* Blue tint */
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Info Badge for Schema */
+        .schema-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Theme Accents */
+        .accent-indigo {
+            border-top: 3px solid #6366f1;
+        }
+
+        .accent-cyan {
+            border-top: 3px solid #06b6d4;
+        }
+
+        .accent-rose {
+            border-top: 3px solid #f43f5e;
+        }
+
+        .accent-teal {
+            border-top: 3px solid #14b8a6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">학생 적응형 학습 DB 스키마</h1>
+                <p class="subtitle">개인화된 학습 경험을 지원하는 데이터 모델링</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fas fa-database text-blue-500"></i> PostgreSQL Schema
+                </div>
+            </div>
+        </div>
+        <!-- 2x2 Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: Student Profiles -->
+            <div class="code-block accent-indigo">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-table text-indigo-400 file-icon"></i>
+                        <span class="file-name">student_profiles (학생 프로파일)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> <span
+                        class="def">student_profiles</span> (
+                    <span class="def">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="def">user_id</span> <span class="type">UUID</span> <span class="kwd">NOT NULL
+                        REFERENCES</span> users(id),
+                    <span class="def">subscription_tier</span> <span class="type">VARCHAR(20)</span> <span
+                        class="kwd">NOT NULL DEFAULT</span> <span class="str">'free'</span>,
+                    <span class="cmt">-- 'free' | 'standard' | 'premium' | 'elite'</span>
+                    <span class="cmt">-- Elo 레이팅 (전체 능력치)</span>
+                    <span class="highlight-line"><span class="def">elo_rating</span> <span class="type">FLOAT</span>
+                        <span class="kwd">NOT NULL DEFAULT</span> <span class="num">1200.0</span>,</span>
+                    <span class="def">elo_games_count</span> <span class="type">INTEGER</span> <span class="kwd">NOT
+                        NULL DEFAULT</span> <span class="num">0</span>,
+                    <span class="def">elo_k_factor</span> <span class="type">FLOAT</span> <span class="kwd">NOT NULL
+                        DEFAULT</span> <span class="num">40.0</span>,
+
+                    <span class="cmt">-- 학년 및 학습 목표</span>
+                    <span class="def">grade_level</span> <span class="type">VARCHAR(20)</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="def">learning_goal_id</span> <span class="type">VARCHAR(50)</span> <span
+                        class="kwd">DEFAULT</span> <span class="str">'school_regular'</span>,
+
+                    <span class="def">created_at</span> <span class="type">TIMESTAMP</span> <span
+                        class="kwd">DEFAULT</span> <span class="func">NOW</span>()
+                    );
+                </div>
+                <div class="schema-badge">Core Profile</div>
+            </div>
+            <!-- Block 2: Knowledge States (BKT) -->
+            <div class="code-block accent-cyan">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-table text-cyan-400 file-icon"></i>
+                        <span class="file-name">student_knowledge_states (지식 상태)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> <span
+                        class="def">student_knowledge_states</span> (
+                    <span class="def">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="def">student_id</span> <span class="type">UUID</span> <span class="kwd">NOT NULL
+                        REFERENCES</span> student_profiles(id),
+                    <span class="def">concept_id</span> <span class="type">UUID</span> <span class="kwd">NOT NULL
+                        REFERENCES</span> curriculum_concepts(id),
+
+                    <span class="cmt">-- BKT 파라미터 (단원별 확률)</span>
+                    <span class="highlight-line"><span class="def">p_learn</span> <span class="type">FLOAT</span> <span
+                            class="kwd">NOT NULL DEFAULT</span> <span class="num">0.1</span>,</span>
+                    <span class="def">p_transit</span> <span class="type">FLOAT</span> <span class="kwd">NOT NULL
+                        DEFAULT</span> <span class="num">0.1</span>,
+                    <span class="def">p_guess</span> <span class="type">FLOAT</span> <span class="kwd">NOT NULL
+                        DEFAULT</span> <span class="num">0.25</span>,
+                    <span class="def">p_slip</span> <span class="type">FLOAT</span> <span class="kwd">NOT NULL
+                        DEFAULT</span> <span class="num">0.1</span>,
+
+                    <span class="def">mastery_level</span> <span class="type">VARCHAR(20)</span> <span class="kwd">NOT
+                        NULL DEFAULT</span> <span class="str">'not_started'</span>,
+                    <span class="def">last_practiced</span> <span class="type">TIMESTAMP</span>,
+
+                    <span class="kwd">UNIQUE</span>(student_id, concept_id)
+                    );
+                </div>
+                <div class="schema-badge">BKT Model</div>
+            </div>
+            <!-- Block 3: Learning Logs -->
+            <div class="code-block accent-rose">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-history text-rose-400 file-icon"></i>
+                        <span class="file-name">learning_logs (학습 로그)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="kwd">CREATE TABLE</span> <span class="def">learning_logs</span> (
+                    <span class="def">id</span> <span class="type">UUID</span> <span class="kwd">PRIMARY KEY
+                        DEFAULT</span> <span class="func">gen_random_uuid</span>(),
+                    <span class="def">student_id</span> <span class="type">UUID</span> <span class="kwd">NOT NULL
+                        REFERENCES</span> student_profiles(id),
+                    <span class="def">question_id</span> <span class="type">UUID</span> <span class="kwd">NOT NULL
+                        REFERENCES</span> quiz_questions(id),
+
+                    <span class="def">is_correct</span> <span class="type">BOOLEAN</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="def">time_spent_ms</span> <span class="type">INTEGER</span>,
+
+                    <span class="cmt">-- 풀이 시점의 레이팅 스냅샷 (재현성 확보)</span>
+                    <span class="highlight-line"><span class="def">student_elo_before</span> <span
+                            class="type">FLOAT</span> <span class="kwd">NOT NULL</span>,</span>
+                    <span class="def">student_elo_after</span> <span class="type">FLOAT</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="def">question_elo_before</span> <span class="type">FLOAT</span> <span class="kwd">NOT
+                        NULL</span>,
+                    <span class="def">expected_score</span> <span class="type">FLOAT</span> <span class="kwd">NOT
+                        NULL</span>,
+
+                    <span class="def">was_ai_generated</span> <span class="type">BOOLEAN</span> <span
+                        class="kwd">DEFAULT FALSE</span>,
+                    <span class="def">created_at</span> <span class="type">TIMESTAMP</span> <span
+                        class="kwd">DEFAULT</span> <span class="func">NOW</span>()
+                    );
+                </div>
+                <div class="schema-badge">Analytics Data</div>
+            </div>
+            <!-- Block 4: Indexes & Optimization -->
+            <div class="code-block accent-teal">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-bolt text-teal-400 file-icon"></i>
+                        <span class="file-name">Indexes (성능 최적화)</span>
+                    </div>
+                    <span class="lang-badge badge-sql">SQL</span>
+                </div>
+                <div class="code-content"><span class="cmt">-- 학습 이력 조회 최적화 (시계열 분석용)</span>
+                    <span class="kwd">CREATE INDEX</span> <span class="def">idx_learning_logs_student</span>
+                    <span class="kwd">ON</span> learning_logs(student_id, created_at <span class="kwd">DESC</span>);
+
+                    <span class="cmt">-- 특정 문제에 대한 정답률 분석용</span>
+                    <span class="kwd">CREATE INDEX</span> <span class="def">idx_learning_logs_question</span>
+                    <span class="kwd">ON</span> learning_logs(question_id, is_correct);
+
+                    <span class="cmt">-- 단원별 지식 상태 조회 (문제 추천용)</span>
+                    <span class="kwd">CREATE INDEX</span> <span class="def">idx_knowledge_states_student</span>
+                    <span class="kwd">ON</span> student_knowledge_states(student_id);
+
+                    <span class="cmt">-- AI 생성 문제 비용 분석용 (부분 인덱스)</span>
+                    <span class="kwd">CREATE INDEX</span> <span class="def">idx_learning_logs_ai_cost</span>
+                    <span class="kwd">ON</span> learning_logs(created_at)
+                    <span class="kwd">WHERE</span> was_ai_generated = <span class="kwd">TRUE</span>;
+                </div>
+                <div class="schema-badge">Performance</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

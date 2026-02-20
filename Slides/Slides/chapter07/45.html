@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>검수 화면 — 원문과 생성 문제를 나란히 비교</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 40px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 5px 0 0 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Split View Container */
+        .split-view {
+            display: flex;
+            height: 380px;
+            gap: 20px;
+            position: relative;
+        }
+
+        .panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 10px 15px;
+            background-color: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 700;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #334155;
+            position: relative;
+        }
+
+        /* Source Text Styling */
+        .highlight-tag {
+            background-color: #bfdbfe;
+            color: #1e40af;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+            border: 1px solid #60a5fa;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .highlight-tag::after {
+            content: attr(data-id);
+            position: absolute;
+            top: -15px;
+            left: 0;
+            background: #1e40af;
+            color: white;
+            font-size: 0.6rem;
+            padding: 1px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+            display: none;
+        }
+
+        .highlight-tag:hover::after {
+            display: block;
+        }
+
+        /* Generated Question Styling */
+        .question-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f8fafc;
+            margin-bottom: 10px;
+        }
+
+        .question-meta {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .input-blank {
+            display: inline-block;
+            width: 80px;
+            border-bottom: 2px solid #cbd5e1;
+            margin: 0 4px;
+        }
+
+        .answer-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.85rem;
+        }
+
+        /* Connection Line (simulated with absolute positioning) */
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 2px;
+            background-color: #3b82f6;
+            z-index: 10;
+        }
+
+        .connection-line::before,
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            top: -3px;
+        }
+
+        .connection-line::before {
+            left: -4px;
+        }
+
+        .connection-line::after {
+            right: -4px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-approve {
+            background-color: #10b981;
+            color: white;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-reject {
+            background-color: #ef4444;
+            color: white;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-regen {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-edit {
+            background-color: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-approve:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-reject:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-regen:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+
+        /* Table */
+        .action-table-container {
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .action-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .action-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        .action-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-draft {
+            background-color: #f1f5f9;
+            color: #64748b;
+        }
+
+        .badge-review {
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+
+        .badge-approved {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Floating Badge */
+        .batch-badge {
+            background-color: #3b82f6;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">검수 화면 — 원문과 생성 문제를 나란히 비교</h1>
+                <p class="subtitle">Human-in-the-Loop 워크플로의 핵심 인터페이스 설계</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-desktop mr-1"></i> UI/UX Design
+                </span>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Split View -->
+            <div class="split-view">
+                <!-- Left Panel: Source Text -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fas fa-file-alt mr-2 text-gray-500"></i>원문 (Source Text)</span>
+                        <span class="text-xs bg-gray-200 px-2 py-1 rounded text-gray-600">Read Only</span>
+                    </div>
+                    <div class="panel-body">
+                        <p class="mb-4">광합성은 식물이 빛에너지를 이용하여 <span class="highlight-tag" data-id="bt-001">이산화탄소</span>와
+                            <span class="highlight-tag" data-id="bt-002">물</span>을 원료로 <span class="highlight-tag"
+                                data-id="bt-003">포도당</span>과 산소를 만들어내는 과정이다.</p>
+                        <p class="mb-4">이 과정은 엽록체에서 일어나며, 빛에너지가 화학에너지로 전환되어 포도당에 저장된다. 광합성의 결과로 생성된 산소는 대기 중으로 방출되어 생물의
+                            호흡에 이용된다.</p>
+                        <p>광합성에 영향을 미치는 요인으로는 빛의 세기, 이산화탄소의 농도, 온도 등이 있다.</p>
+                    </div>
+                </div>
+                <!-- Visual Connection -->
+                <div class="connection-line"></div>
+                <div
+                    style="position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); background: #eff6ff; padding: 4px 8px; border-radius: 12px; border: 1px solid #bfdbfe; font-size: 0.7rem; color: #1e40af; font-weight: 700; z-index: 20;">
+                    Mapped by Tag ID
+                </div>
+                <!-- Right Panel: Generated Question -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <span><i class="fas fa-robot mr-2 text-blue-500"></i>AI 생성 문제 (Draft)</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-400">Model: Gemini 2.5 Flash</span>
+                            <span class="batch-badge">1 / 10</span>
+                        </div>
+                    </div>
+                    <div class="panel-body bg-gray-50">
+                        <div class="question-box border-l-4 border-l-blue-500">
+                            <div class="question-meta">
+                                <span>TYPE: fill_in_the_blank</span>
+                                <span>Source: bt-001</span>
+                            </div>
+                            <div class="question-text">
+                                Q1. 광합성은 식물이 빛에너지를 이용하여 <span class="input-blank"></span>와 물을 원료로 포도당을 합성하는 과정이다.
+                            </div>
+                            <div class="answer-section">
+                                <p class="text-green-700 font-bold mb-1">정답: 이산화탄소</p>
+                                <p class="text-gray-600 text-sm">해설: 광합성의 주요 원료는 이산화탄소와 물입니다. 이산화탄소는 기공을 통해 흡수됩니다.</p>
+                                <p class="text-gray-500 text-xs mt-1">힌트: ㅇㅅㅎㅌㅅ (5글자)</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                            <i class="fas fa-exclamation-circle mr-1"></i>
+                            <strong>AI Confidence Score: 98%</strong><br />
+                            문맥상 모호함이 발견되지 않았습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="flex flex-col gap-1">
+                    <span class="font-bold text-gray-700">검수 액션 (Review Actions)</span>
+                    <span class="text-xs text-gray-500">선택한 액션에 따라 문제의 상태(Status)가 변경됩니다.</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-approve">
+                        <i class="fas fa-check"></i> 승인
+                    </button>
+                    <button class="btn btn-edit">
+                        <i class="fas fa-pencil-alt"></i> 직접수정
+                    </button>
+                    <button class="btn btn-regen">
+                        <i class="fas fa-sync-alt"></i> 재생성
+                    </button>
+                    <button class="btn btn-reject">
+                        <i class="fas fa-times"></i> 반려
+                    </button>
+                </div>
+            </div>
+            <!-- Action Table -->
+            <div class="action-table-container">
+                <table class="action-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">액션</th>
+                            <th width="20%">상태 변경 (Status Flow)</th>
+                            <th width="15%">비용 발생</th>
+                            <th width="50%">동작 설명</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-green-600"><i class="fas fa-check mr-2"></i>승인</td>
+                            <td><span class="badge-review">in_review</span> → <span
+                                    class="badge-approved">approved</span></td>
+                            <td class="text-gray-400">없음 ($0)</td>
+                            <td>현재 생성된 문제를 그대로 확정하고 학생 문제은행에 배포합니다.</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-yellow-600"><i class="fas fa-pencil-alt mr-2"></i>직접수정</td>
+                            <td><span class="badge-review">in_review</span> → <span
+                                    class="badge-approved">approved</span></td>
+                            <td class="text-gray-400">없음 ($0)</td>
+                            <td>선생님이 내용을 편집하여 승인합니다. (Method: ai_then_manual)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-blue-600"><i class="fas fa-sync-alt mr-2"></i>재생성</td>
+                            <td><span class="badge-rejected">rejected</span> → <span class="badge-draft">draft</span>
+                            </td>
+                            <td class="text-red-500 font-bold">발생 (AI 호출)</td>
+                            <td>피드백을 반영하여 AI가 다시 생성합니다. (최대 3회 제한)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 판매자 유형별 시스템 설계</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #ef4444;
+            /* Changed to red for caution/legal */
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #7f1d1d;
+            /* Dark red */
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Reduced gap slightly */
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area - 5 Step Process */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 120px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 140px;
+            /* Reduced width for 5 steps */
+            position: relative;
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .icon-step1 {
+            background-color: #64748b;
+        }
+
+        /* Signup */
+        .icon-step2 {
+            background-color: #ef4444;
+        }
+
+        /* Disabled */
+        .icon-step3 {
+            background-color: #f59e0b;
+        }
+
+        /* Upload */
+        .icon-step4 {
+            background-color: #3b82f6;
+        }
+
+        /* Verify */
+        .icon-step5 {
+            background-color: #10b981;
+        }
+
+        /* Active */
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 10px;
+            top: -20px;
+            /* Adjusted vertical alignment */
+            z-index: 1;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid #cbd5e1;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        /* 2. Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Sans KR', sans-serif;
+            /* Using standard font for readability */
+            font-size: 0.8rem;
+        }
+
+        .db-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .db-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            gap: 4px;
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-neutral {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .tag-logic {
+            background-color: #8b5cf6;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 12px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .type {
+            color: #e5c07b;
+        }
+
+        .highlight-line {
+            background-color: rgba(239, 68, 68, 0.15);
+            /* Red tint for emphasis */
+            display: block;
+            margin: 0 -12px;
+            padding: 0 12px;
+            border-left: 3px solid #ef4444;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">[A] 판매자 유형별 시스템 설계 — 겸직 리스크 제어</h1>
+                <p class="subtitle">판매자 신분에 따라 '유료 판매' 권한을 시스템 레벨에서 자동 차단 및 제어</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-bold">
+                    <i class="fas fa-shield-alt mr-2"></i> Compliance Check
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-user-lock text-red-500"></i> 현직 교원 가입 및 권한 승인 프로세스
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-step1">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="step-title">회원 가입</div>
+                        <div class="step-desc">신분: "현직 교원"<br />선택 시</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-step2">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="step-title">판매 권한 잠김</div>
+                        <div class="step-desc">기본값: 유료판매 ❌<br />무료공유 ✅</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-step3">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="step-title">겸직허가서 업로드</div>
+                        <div class="step-desc">학교장 직인 포함<br />PDF 제출</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 4 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-step4">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="step-title">관리자 확인</div>
+                        <div class="step-desc">서류 유효성 및<br />만료일 검증</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow"></div>
+                    <!-- Step 5 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-step5">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-title">판매 권한 활성</div>
+                        <div class="step-desc">허가 기간 동안만<br />판매 가능</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Area -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-th-list text-blue-600"></i> 판매자 유형별 권한 매트릭스
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">판매자 유형 (SellerType)</th>
+                                <th style="width: 15%">유료 판매</th>
+                                <th style="width: 15%">무료 공유</th>
+                                <th style="width: 20%">필수 제출 서류</th>
+                                <th style="width: 30%">비고 / 시스템 제어</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>현직 교원 (허가 ✅)</strong></td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td>겸직허가서</td>
+                                <td>관리자 승인 후 <span class="text-green-600 font-bold">permitVerified=true</span> 전환</td>
+                            </tr>
+                            <tr>
+                                <td><strong>현직 교원 (허가 ❌)</strong></td>
+                                <td><span class="status-badge badge-danger"><i class="fas fa-times"></i> 불가</span></td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td>-</td>
+                                <td>수익 창출 기능 원천 차단 (영리업무 회피)</td>
+                            </tr>
+                            <tr>
+                                <td>전직 교원 / 학원 강사</td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td>(자격 증빙 선택)</td>
+                                <td>공무원법 미적용 대상, 즉시 판매 가능</td>
+                            </tr>
+                            <tr>
+                                <td>일반 창작자 / 기관</td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td><span class="status-badge badge-success"><i class="fas fa-check"></i> 가능</span></td>
+                                <td>사업자등록증(기관)</td>
+                                <td>세금계산서 발행 프로세스 적용</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code Implementation -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> IMPLEMENTATION: TYPE DEFINITION &amp; LOGIC
+                </div>
+                <div class="code-container">
+                    <!-- Left: TypeScript Definitions -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> types/seller.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">export</span> <span class="kwd">enum</span> <span
+                                class="type">SellerType</span> {
+                            <span class="prop">ACTIVE_TEACHER</span> = <span class="str">'active_teacher'</span>, <span
+                                class="cmt">// 현직 교원 (국공립/사립)</span>
+                            <span class="prop">ACTIVE_PROFESSOR</span> = <span class="str">'active_professor'</span>,
+                            <span class="cmt">// 현직 교수</span>
+                            <span class="prop">FORMER_TEACHER</span> = <span class="str">'former_teacher'</span>, <span
+                                class="cmt">// 전직 교원</span>
+                            <span class="prop">ACADEMY_INSTRUCTOR</span> = <span
+                                class="str">'academy_instructor'</span>, <span class="cmt">// 학원 강사</span>
+                            <span class="prop">GENERAL_CREATOR</span> = <span class="str">'general_creator'</span>,
+                            <span class="cmt">// 일반 제작자</span>
+                            <span class="prop">INSTITUTION</span> = <span class="str">'institution'</span> <span
+                                class="cmt">// 기관/출판사</span>
+                            }
+
+                            <span class="kwd">export</span> <span class="kwd">interface</span> <span
+                                class="type">SellerProfile</span> {
+                            <span class="prop">userId</span>: <span class="type">string</span>;
+                            <span class="prop">type</span>: <span class="type">SellerType</span>;
+                            <span class="prop">permitVerified</span>: <span class="type">boolean</span>; <span
+                                class="cmt">// 겸직허가 확인 여부</span>
+                            <span class="prop">permitExpiresAt</span>?: <span class="type">Date</span>; <span
+                                class="cmt">// 허가 만료일</span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: Permission Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-shield-alt text-purple-400"></i> services/permissionService.ts
+                            </div>
+                            <span class="lang-tag tag-logic">LOGIC</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">function</span> <span
+                                class="func">canSellPaidContent</span>(<span class="prop">profile</span>: <span
+                                class="type">SellerProfile</span>): <span class="type">boolean</span> {
+                            <span class="cmt">// 1. 현직 교원/교수인 경우 엄격 체크</span>
+                            <span class="kwd">if</span> (<span class="prop">profile</span>.<span
+                                class="prop">type</span> === <span class="type">SellerType</span>.<span
+                                class="prop">ACTIVE_TEACHER</span> ||
+                            <span class="prop">profile</span>.<span class="prop">type</span> === <span
+                                class="type">SellerType</span>.<span class="prop">ACTIVE_PROFESSOR</span>) {
+
+                            <span class="highlight-line"><span class="cmt">// 겸직허가 미확인 시 판매 불가 (자동 차단)</span></span>
+                            <span class="highlight-line"><span class="kwd">if</span> (!<span
+                                    class="prop">profile</span>.<span class="prop">permitVerified</span>) <span
+                                    class="kwd">return</span> <span class="kwd">false</span>;</span>
+                            <span class="cmt">// 허가 기간 만료 체크</span>
+                            <span class="kwd">if</span> (<span class="prop">profile</span>.<span
+                                class="prop">permitExpiresAt</span> &amp;&amp; <span class="kwd">new</span> <span
+                                class="type">Date</span>() &gt; <span class="prop">profile</span>.<span
+                                class="prop">permitExpiresAt</span>) {
+                            <span class="kwd">return</span> <span class="kwd">false</span>;
+                            }
+                            }
+
+                            <span class="cmt">// 2. 그 외 유형은 기본 허용</span>
+                            <span class="kwd">return</span> <span class="kwd">true</span>;
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

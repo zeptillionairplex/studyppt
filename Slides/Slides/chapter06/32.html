@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AI 비용 절감 - 6단계 피라미드</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Background Decoration */
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.08;
+        }
+
+        .circle-1 {
+            width: 700px;
+            height: 700px;
+            background-color: #3b82f6;
+            top: -300px;
+            right: -200px;
+        }
+
+        .circle-2 {
+            width: 500px;
+            height: 500px;
+            background-color: #1e40af;
+            bottom: -200px;
+            left: -200px;
+        }
+
+        /* Header Area */
+        .header-area {
+            z-index: 10;
+            padding: 40px 60px 20px 60px;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #2563eb;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 3rem;
+            color: #1e3a8a;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .sub-title {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        /* Main Content Layout */
+        .content-area {
+            flex: 1;
+            display: flex;
+            padding: 30px 60px;
+            gap: 50px;
+            z-index: 10;
+            align-items: center;
+        }
+
+        /* Pyramid Styles */
+        .pyramid-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 100%;
+        }
+
+        .pyramid-level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            position: relative;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            /* Rounded rectangles approach for cleaner UI */
+        }
+
+        /* Specific Levels (Top to Bottom) */
+        .level-6 {
+            width: 180px;
+            height: 45px;
+            background-color: #93c5fd;
+            color: #1e3a8a;
+            z-index: 6;
+        }
+
+        .level-5 {
+            width: 260px;
+            height: 48px;
+            background-color: #60a5fa;
+            z-index: 5;
+        }
+
+        .level-4 {
+            width: 340px;
+            height: 52px;
+            background-color: #3b82f6;
+            z-index: 4;
+        }
+
+        .level-3 {
+            width: 420px;
+            height: 56px;
+            background-color: #2563eb;
+            z-index: 3;
+        }
+
+        .level-2 {
+            width: 500px;
+            height: 60px;
+            background-color: #1d4ed8;
+            z-index: 2;
+        }
+
+        .level-1 {
+            width: 580px;
+            height: 64px;
+            background-color: #1e3a8a;
+            z-index: 1;
+        }
+
+        /* Arrow Indicator */
+        .priority-arrow {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: #64748b;
+        }
+
+        .arrow-line {
+            width: 2px;
+            flex: 1;
+            background-color: #cbd5e1;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .arrow-line::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #cbd5e1;
+            /* Inverted logic: Start from bottom is priority 1 */
+        }
+
+        .priority-label {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            margin-right: 15px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            flex: 1.2;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: #e2e8f0;
+            color: #475569;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .row-highlight .priority-badge {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .cost-free {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .cost-paid {
+            color: #ea580c;
+            font-weight: 600;
+        }
+
+        .savings-tag {
+            background-color: #dcfce7;
+            color: #15803d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Decorative Background -->
+        <div class="decorative-circle circle-1"></div>
+        <div class="decorative-circle circle-2"></div>
+        <!-- Header -->
+        <div class="header-area">
+            <div class="logo-area">
+                <i class="fas fa-layer-group"></i>
+                <span>EduContent CMS</span>
+            </div>
+            <h1 class="main-title">AI 비용 절감 — 6단계 피라미드</h1>
+            <p class="sub-title">계약이 필요 없는 최적화부터 우선 적용하여 비용 효율 극대화</p>
+        </div>
+        <!-- Content -->
+        <div class="content-area">
+            <!-- Left: Pyramid -->
+            <div class="pyramid-container">
+                <!-- Priority Indicator -->
+                <div class="priority-arrow" style="left: 0; height: 350px;">
+                    <div style="margin-bottom: 10px; font-weight: bold; font-size: 0.8rem; color: #94a3b8;">나중에 적용</div>
+                    <div
+                        style="width: 2px; height: 100%; background: linear-gradient(to bottom, #cbd5e1 0%, #1e3a8a 100%); position: relative;">
+                        <!-- Arrowhead at bottom -->
+                        <div
+                            style="position: absolute; bottom: 0; left: -4px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid #1e3a8a;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-weight: bold; font-size: 0.9rem; color: #1e3a8a;">우선 적용</div>
+                </div>
+                <!-- Pyramid Levels (Top to Bottom visually, but logical order is reversed) -->
+                <div class="pyramid-level level-6">
+                    <span style="margin-right:8px; opacity:0.7;">#6</span> 볼륨 디스카운트
+                </div>
+                <div class="pyramid-level level-5">
+                    <span style="margin-right:8px; opacity:0.8;">#5</span> Batch API
+                </div>
+                <div class="pyramid-level level-4">
+                    <span style="margin-right:8px; opacity:0.8;">#4</span> 제조사 프롬프트 캐싱
+                </div>
+                <div class="pyramid-level level-3">
+                    <span style="margin-right:8px; opacity:0.8;">#3</span> 애플리케이션 캐싱 (Redis)
+                </div>
+                <div class="pyramid-level level-2">
+                    <span style="margin-right:8px; opacity:0.9;">#2</span> 저가 모델 선택 (Router)
+                </div>
+                <div class="pyramid-level level-1">
+                    <i class="fas fa-star" style="margin-right:8px; color:#fbbf24;"></i> 프롬프트 고도화
+                </div>
+                <p style="margin-top: 20px; color: #64748b; font-size: 0.9rem; font-weight: 500;">
+                    <i class="fas fa-arrow-up"></i> 위로 갈수록 실행 난이도/계약 필요성 증가
+                </p>
+            </div>
+            <!-- Right: Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">순위</th>
+                            <th style="width: 30%;">전략</th>
+                            <th style="width: 15%;">비용</th>
+                            <th style="width: 15%;">계약</th>
+                            <th style="width: 30%;">절감 효과</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row-highlight">
+                            <td><span class="priority-badge" style="background-color: #1e3a8a; color: white;">1</span>
+                            </td>
+                            <td style="font-weight: 700; color: #1e3a8a;">프롬프트 고도화</td>
+                            <td class="cost-free">$0</td>
+                            <td>없음</td>
+                            <td>
+                                <p>저가 모델로 고품질 달성</p>
+                            </td>
+                        </tr>
+                        <tr class="row-highlight">
+                            <td><span class="priority-badge" style="background-color: #1d4ed8; color: white;">2</span>
+                            </td>
+                            <td style="font-weight: 600; color: #1d4ed8;">저가 모델 (Router)</td>
+                            <td class="cost-free">$0</td>
+                            <td>없음</td>
+                            <td>
+                                <p>비용 1/10 ~ 1/50 절감</p>
+                            </td>
+                        </tr>
+                        <tr class="row-highlight">
+                            <td><span class="priority-badge" style="background-color: #2563eb; color: white;">3</span>
+                            </td>
+                            <td style="font-weight: 600;">앱 캐싱 (Redis)</td>
+                            <td class="cost-paid">서버비</td>
+                            <td>없음</td>
+                            <td><span class="savings-tag">중복 호출 100% 제거</span></td>
+                        </tr>
+                        <tr class="row-highlight">
+                            <td><span class="priority-badge" style="background-color: #3b82f6; color: white;">4</span>
+                            </td>
+                            <td style="font-weight: 600;">프롬프트 캐싱</td>
+                            <td class="cost-free">$0</td>
+                            <td>없음</td>
+                            <td><span class="savings-tag">시스템 프롬프트 50~90%↓</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="priority-badge">5</span></td>
+                            <td>Batch API</td>
+                            <td class="cost-free">$0</td>
+                            <td>없음</td>
+                            <td>
+                                <p>전체 50% 할인 (비동기)</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="priority-badge">6</span></td>
+                            <td>볼륨 디스카운트</td>
+                            <td class="cost-paid">약정액</td>
+                            <td style="color:#ef4444; font-weight:600;">협상 필수</td>
+                            <td>
+                                <p>추가 15~30%+</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="background-color: #eff6ff; padding: 15px 20px; border-top: 1px solid #e2e8f0;">
+                    <p style="margin: 0; font-size: 0.85rem; color: #475569;">
+                        <i class="fas fa-info-circle" style="color: #3b82f6; margin-right: 5px;"></i>
+                        <strong>전략 포인트:</strong> 1~4순위는 코드 레벨에서 즉시 적용 가능하며 계약이 불필요합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

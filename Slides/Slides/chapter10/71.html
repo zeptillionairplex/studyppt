@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 디지털 펜 입력 및 필기 인식</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Code Grid Layout */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            /* Slate 800 */
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        /* Block Header */
+        .block-header {
+            background-color: #0f172a;
+            /* Slate 900 */
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-icon {
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            /* Slate 300 */
+            font-weight: 600;
+        }
+
+        .lang-badge {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .badge-tsx {
+            background-color: #61dafb;
+            color: #1e293b;
+        }
+
+        /* Code Content */
+        .code-content {
+            padding: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            /* Adjusted for readability */
+            line-height: 1.5;
+            color: #e2e8f0;
+            overflow: hidden;
+            flex: 1;
+            white-space: pre;
+        }
+
+        /* Syntax Highlighting */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* keyword */
+        .def {
+            color: #e5c07b;
+        }
+
+        /* definition */
+        .str {
+            color: #98c379;
+        }
+
+        /* string */
+        .num {
+            color: #d19a66;
+        }
+
+        /* number */
+        .prop {
+            color: #e06c75;
+        }
+
+        /* property */
+        .func {
+            color: #61afef;
+        }
+
+        /* function */
+        .cls {
+            color: #e5c07b;
+        }
+
+        /* class */
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* comment */
+        .tag {
+            color: #e06c75;
+        }
+
+        /* html tag */
+        .attr {
+            color: #d19a66;
+        }
+
+        /* html attr */
+
+        /* Specific Highlight Decoration */
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.2);
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Theme Accents */
+        .accent-yellow {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .accent-blue {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .accent-green {
+            border-top: 3px solid #10b981;
+        }
+
+        .accent-purple {
+            border-top: 3px solid #8b5cf6;
+        }
+
+        /* Data Preview Overlay */
+        .data-preview {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            max-width: 200px;
+        }
+
+        .preview-label {
+            font-size: 0.65rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .preview-json {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.7rem;
+            color: #334155;
+            white-space: pre-wrap;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">디지털 펜 입력 + 손글씨 인식</h1>
+                <p class="subtitle">Pointer Events API &amp; 3단계 인식 경로 (Fallback Strategy)</p>
+            </div>
+            <div class="text-right">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-bold mb-1">
+                    <i class="fab fa-chrome text-blue-500"></i> Web Standard
+                </div>
+            </div>
+        </div>
+        <!-- 2x2 Code Grid -->
+        <div class="code-grid">
+            <!-- Block 1: BrainDumpCanvas.tsx -->
+            <div class="code-block accent-yellow">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fab fa-react text-blue-400 file-icon"></i>
+                        <span class="file-name">components/BrainDumpCanvas.tsx</span>
+                    </div>
+                    <span class="lang-badge badge-tsx">TSX</span>
+                </div>
+                <div class="code-content"><span class="kwd">import</span> { useRef } <span class="kwd">from</span> <span
+                        class="str">'react'</span>
+                    <span class="kwd">import</span> { usePenInput } <span class="kwd">from</span> <span
+                        class="str">'@hooks/usePenInput'</span>
+                    <span class="kwd">export const</span> BrainDumpCanvas = () =&gt; {
+                    <span class="kwd">const</span> canvasRef = <span class="func">useRef</span>&lt;<span
+                        class="cls">HTMLCanvasElement</span>&gt;(<span class="kwd">null</span>)
+                    <span class="kwd">const</span> { handlePointerDown, handlePointerMove, handlePointerUp }
+                    = <span class="func">usePenInput</span>(canvasRef)
+
+                    <span class="kwd">return</span> (
+                    &lt;<span class="tag">canvas</span>
+                    <span class="attr">ref</span>={canvasRef}
+                    <span class="cmt">// 중요: 브라우저 기본 제스처(스크롤/줌) 비활성화</span>
+                    <span class="highlight-line"><span class="attr">style</span>={{ <span
+                            class="prop">touchAction</span>: <span class="str">'none'</span> }}</span>
+                    <span class="attr">onPointerDown</span>={handlePointerDown}
+                    <span class="attr">onPointerMove</span>={handlePointerMove}
+                    <span class="attr">onPointerUp</span>={handlePointerUp}
+                    <span class="attr">className</span>=<span class="str">"w-full h-full cursor-crosshair"</span>
+                    /&gt;
+                    )
+                    }
+                </div>
+            </div>
+            <!-- Block 2: usePenInput.ts -->
+            <div class="code-block accent-blue">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-file-code text-blue-400 file-icon"></i>
+                        <span class="file-name">hooks/usePenInput.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">const</span> handlePointerDown = <span
+                        class="func">useCallback</span>((<span class="def">e</span>: <span
+                        class="cls">React.PointerEvent</span>) =&gt; {
+                    <span class="kwd">const</span> canvas = canvasRef.current
+                    <span class="kwd">if</span> (!canvas) <span class="kwd">return</span>
+                    <span class="cmt">// 포인터 캡처: 캔버스 밖으로 나가도 이벤트 수신</span>
+                    canvas.<span class="func">setPointerCapture</span>(e.pointerId)
+
+                    <span class="kwd">const</span> { pointerType, pressure, clientX, clientY } = e
+                    <span class="kwd">const</span> rect = canvas.<span class="func">getBoundingClientRect</span>()
+
+                    <span class="cmt">// 필압(pressure) 정보 저장 (0.0 ~ 1.0)</span>
+                    currentStroke.current = [{
+                    <span class="prop">x</span>: clientX - rect.left,
+                    <span class="prop">y</span>: clientY - rect.top,
+                    <span class="prop">t</span>: Date.<span class="func">now</span>(),
+                    <span class="prop">p</span>: pointerType === <span class="str">'pen'</span> ? pressure : <span
+                        class="num">0.5</span>
+                    }]
+                    }, [])
+                </div>
+                <!-- Data Preview Overlay -->
+                <div class="data-preview">
+                    <span class="preview-label">Captured Data Point</span>
+                    <div class="preview-json">{
+                        "x": 145.2,
+                        "y": 88.5,
+                        "pressure": 0.82,
+                        "type": "pen"
+                        }</div>
+                </div>
+            </div>
+            <!-- Block 3: RecognitionService.ts (Fallback Logic) -->
+            <div class="code-block accent-green">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-network-wired text-green-400 file-icon"></i>
+                        <span class="file-name">services/HandwritingService.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">export async function</span> <span
+                        class="func">recognizeHandwriting</span>(<span class="def">strokes</span>: <span
+                        class="cls">Stroke</span>[]): <span class="cls">Promise</span>&lt;<span
+                        class="cls">string</span>&gt; {
+
+                    <span class="cmt">// 1. 브라우저 내장 API 시도 (비용 $0, 오프라인)</span>
+                    <span class="kwd">if</span> (<span class="str">'createHandwritingRecognizer'</span> <span
+                        class="kwd">in</span> navigator) {
+                    <span class="kwd">try</span> {
+                    <span class="kwd">return await</span> <span class="func">recognizeWithBrowserAPI</span>(strokes)
+                    } <span class="kwd">catch</span> (e) {
+                    console.<span class="func">warn</span>(<span class="str">'Native API failed, falling
+                        back...'</span>)
+                    }
+                    }
+
+                    <span class="cmt">// 2. Google Cloud Vision API 폴백 (월 1,000건 무료)</span>
+                    <span class="kwd">const</span> imageBlob = <span class="func">strokesToImageBlob</span>(strokes)
+                    <span class="kwd">return await</span> <span class="func">recognizeWithVisionAPI</span>(imageBlob)
+
+                    <span class="cmt">// 3. MyScript (Math/Diagram 특화, 상용) - 옵션</span>
+                    <span class="cmt">// return await recognizeWithMyScript(strokes)</span>
+                    }
+                </div>
+            </div>
+            <!-- Block 4: Providers Config -->
+            <div class="code-block accent-purple">
+                <div class="block-header">
+                    <div class="file-info">
+                        <i class="fas fa-cogs text-purple-400 file-icon"></i>
+                        <span class="file-name">config/RecognitionProviders.ts</span>
+                    </div>
+                    <span class="lang-badge badge-ts">TS</span>
+                </div>
+                <div class="code-content"><span class="kwd">export const</span> RECOGNITION_STRATEGY = {
+                    <span class="prop">BROWSER_NATIVE</span>: {
+                    <span class="prop">name</span>: <span class="str">'Native Handwriting API'</span>,
+                    <span class="prop">cost</span>: <span class="str">'Free ($0)'</span>,
+                    <span class="prop">offline</span>: <span class="kwd">true</span>,
+                    <span class="prop">support</span>: [<span class="str">'Chrome 99+'</span>, <span
+                        class="str">'Edge'</span>],
+                    <span class="highlight-line"><span class="prop">priority</span>: <span class="num">1</span></span>
+                    },
+                    <span class="prop">GOOGLE_VISION</span>: {
+                    <span class="prop">name</span>: <span class="str">'Cloud Vision OCR'</span>,
+                    <span class="prop">cost</span>: <span class="str">'Free Tier / Paid'</span>,
+                    <span class="prop">offline</span>: <span class="kwd">false</span>,
+                    <span class="prop">priority</span>: <span class="num">2</span>
+                    },
+                    <span class="prop">MYSCRIPT</span>: {
+                    <span class="prop">name</span>: <span class="str">'MyScript iink SDK'</span>,
+                    <span class="prop">cost</span>: <span class="str">'Paid (Commercial)'</span>,
+                    <span class="prop">specialty</span>: [<span class="str">'Math'</span>, <span
+                        class="str">'Diagrams'</span>],
+                    <span class="prop">priority</span>: <span class="str">'Optional'</span>
+                    }
+                    } <span class="kwd">as const</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

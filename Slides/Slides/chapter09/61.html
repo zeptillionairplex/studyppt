@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 초기 수준 진단 CAT</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 120px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 180px;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-start {
+            background-color: #3b82f6;
+        }
+
+        .icon-adjust {
+            background-color: #f59e0b;
+        }
+
+        .icon-finish {
+            background-color: #10b981;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 5px;
+            white-space: nowrap;
+        }
+
+        /* 2. Sample Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-correct {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .badge-wrong {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .elo-change-up {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .elo-change-down {
+            color: #991b1b;
+            font-weight: bold;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .op {
+            color: #56b6c2;
+        }
+
+        .highlight-line {
+            background-color: rgba(59, 130, 246, 0.2);
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #3b82f6;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">신규 학생 진단(CAT) — 10~15문제로 빠르게 수렴</h1>
+                <p class="subtitle">적응형 진단 테스트(CAT) 프로세스와 구현 로직</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-chart-line mr-2"></i> Adaptive Diagnostics
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-random text-blue-500"></i> CAT PROCESS
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-start">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="step-title">Start</div>
+                        <div class="step-desc">중간 난이도 (Elo 1200)<br />첫 문제 제시</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">응답 분석</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-adjust">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <div class="step-title">Adjustment</div>
+                        <div class="step-desc">맞히면 ↑ / 틀리면 ↓<br />난이도 실시간 조정</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">신뢰도 &gt; 90%</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-finish">
+                            <i class="fas fa-flag-checkered"></i>
+                        </div>
+                        <div class="step-title">Convergence</div>
+                        <div class="step-desc">10~15문제 내 수렴<br />최종 Elo 확정</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Sample -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-list-ol text-green-600"></i> DIAGNOSTIC SESSION LOG (Example)
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Q#</th>
+                                <th style="width: 20%">문제 난이도</th>
+                                <th style="width: 20%">예상 정답률</th>
+                                <th style="width: 15%">결과</th>
+                                <th style="width: 35%">Elo 추정치 변화 (K=Var)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Q1</td>
+                                <td>1200 (중간)</td>
+                                <td>50%</td>
+                                <td><span class="status-badge badge-correct">정답</span></td>
+                                <td>1200 → <span class="elo-change-up">1350</span> (+150, K=300)</td>
+                            </tr>
+                            <tr>
+                                <td>Q2</td>
+                                <td>1350 (상향)</td>
+                                <td>50%</td>
+                                <td><span class="status-badge badge-wrong">오답</span></td>
+                                <td>1350 → <span class="elo-change-down">1280</span> (-70, K=140)</td>
+                            </tr>
+                            <tr>
+                                <td>Q3</td>
+                                <td>1280 (조정)</td>
+                                <td>50%</td>
+                                <td><span class="status-badge badge-correct">정답</span></td>
+                                <td>1280 → <span class="elo-change-up">1320</span> (+40, K=80)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code Implementation -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> IMPLEMENTATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: Select Question -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> selectNextQuestion.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">function</span> <span
+                                class="func">selectNextDiagnosticQuestion</span>(
+                            state: <span class="prop">DiagnosticState</span>,
+                            pool: <span class="prop">Question</span>[]
+                            ) {
+                            <span class="cmt">// 1. 종료 조건: 15문제 or 신뢰도 90%</span>
+                            <span class="kwd">if</span> (state.<span class="prop">questionsAsked</span> &gt;= <span
+                                class="num">15</span> || state.<span class="prop">confidence</span> &gt; <span
+                                class="num">0.9</span>)
+                            <span class="kwd">return</span> <span class="kwd">null</span>;
+
+                            <span class="cmt">// 2. 맞힐 확률 ≈ 50%인 문제 (정보량 최대)</span>
+                            <span class="kwd">const</span> targetElo = state.<span class="prop">currentEstimate</span>;
+
+                            <span class="kwd">return</span> pool.<span class="func">sort</span>((a, b) =&gt;
+                            <span class="highlight-line">Math.<span class="func">abs</span>(a.<span
+                                    class="prop">elo</span> - targetElo) - Math.<span class="func">abs</span>(b.<span
+                                    class="prop">elo</span> - targetElo)</span>
+                            )[<span class="num">0</span>];
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: Update State -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-calculator text-green-400"></i> updateState.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">function</span> <span
+                                class="func">updateDiagnosticState</span>(
+                            state: <span class="prop">DiagnosticState</span>,
+                            isCorrect: <span class="kwd">boolean</span>
+                            ) {
+                            <span class="cmt">// 초반에는 K값을 높게 설정하여 빠르게 수렴</span>
+                            <span class="kwd">const</span> K = Math.<span class="func">max</span>(<span
+                                class="num">48</span> - state.<span class="prop">questionsAsked</span> * <span
+                                class="num">2</span>, <span class="num">16</span>);
+
+                            <span class="kwd">const</span> expected = <span
+                                class="func">expectedScore</span>(state.<span class="prop">estimate</span>,
+                            question.<span class="prop">elo</span>);
+                            <span class="kwd">const</span> actual = isCorrect ? <span class="num">1</span> : <span
+                                class="num">0</span>;
+
+                            <span class="kwd">return</span> {
+                            <span class="highlight-line"><span class="prop">estimate</span>: state.<span
+                                    class="prop">estimate</span> + K * (actual - expected),</span>
+                            <span class="prop">confidence</span>: Math.<span class="func">min</span>(<span
+                                class="num">0.5</span> + (state.<span class="prop">cnt</span> + <span
+                                class="num">1</span>) * <span class="num">0.03</span>, <span class="num">0.95</span>)
+                            };
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

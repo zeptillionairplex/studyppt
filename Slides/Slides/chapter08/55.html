@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 변경 영향 분석</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #f59e0b;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #b45309;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #78350f;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 120px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 180px;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-compare {
+            background-color: #f59e0b;
+        }
+
+        .icon-classify {
+            background-color: #ef4444;
+        }
+
+        .icon-stale {
+            background-color: #f97316;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 5px;
+        }
+
+        /* 2. Sample Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #fff7ed;
+            color: #9a3412;
+            padding: 10px 15px;
+            text-align: left;
+            border-bottom: 2px solid #fdba74;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ffedd5;
+            color: #334155;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-unchanged {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .status-modified {
+            background-color: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde047;
+        }
+
+        .status-deleted {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .status-added {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .json-val {
+            color: #d97706;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+            /* Important for flex child scroll */
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-logic {
+            background-color: #ec4899;
+            color: white;
+        }
+
+        .tag-sql {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .sql-kwd {
+            color: #61afef;
+            font-weight: bold;
+        }
+
+        .sql-str {
+            color: #98c379;
+        }
+
+        .sql-op {
+            color: #c678dd;
+        }
+
+        .highlight-line {
+            background-color: rgba(245, 158, 11, 0.2);
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #f59e0b;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">원문 수정 시 — 어떤 문제가 영향받는가</h1>
+                <p class="subtitle">모든 문제를 Stale 처리하는 대신, 실제로 변경된 태그 기반으로 '선택적 Stale' 처리</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold">
+                    <i class="fas fa-filter mr-2"></i> Selective Impact Analysis
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-random text-yellow-600"></i> IMPACT ANALYSIS FLOW
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-compare">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="step-title">Annotation 비교</div>
+                        <div class="step-desc">v5 vs v6 ID 매칭</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Diff Logic</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-classify">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="step-title">변경 유형 분류</div>
+                        <div class="step-desc">속성 변경 / 삭제 / 추가</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Query DB</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-stale">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="step-title">선택적 Stale</div>
+                        <div class="step-desc">영향받는 문제만 표시</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Sample -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-clipboard-check text-orange-600"></i> CHANGE CLASSIFICATION (v5 → v6)
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">Tag ID</th>
+                                <th style="width: 20%">이전 상태 (v5)</th>
+                                <th style="width: 20%">현재 상태 (v6)</th>
+                                <th style="width: 25%">변경 분석</th>
+                                <th style="width: 20%">조치 (Action)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag-badge" style="background:#eee; color:#555">bt-001</span></td>
+                                <td>Existing</td>
+                                <td>Existing (Same)</td>
+                                <td><span class="status-unchanged">변경 없음 ✅</span></td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge" style="background:#eee; color:#555">bt-002</span></td>
+                                <td>difficulty: "easy"</td>
+                                <td>difficulty: "hard"</td>
+                                <td><span class="status-modified">속성 변경 ⚠️</span></td>
+                                <td><span class="json-val">Set Stale</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge" style="background:#eee; color:#555">bt-003</span></td>
+                                <td>Existing</td>
+                                <td>Deleted</td>
+                                <td><span class="status-deleted">삭제됨 ❌</span></td>
+                                <td><span class="json-val">Set Stale (Orphan)</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge" style="background:#eee; color:#555">bt-004</span></td>
+                                <td>None</td>
+                                <td>Created</td>
+                                <td><span class="status-added">신규 추가 ➕</span></td>
+                                <td>None (No derivatives yet)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code Implementation -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-pink-500"></i> IMPLEMENTATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: Impact Analysis Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-project-diagram text-pink-400"></i> impactAnalysis.ts
+                            </div>
+                            <span class="lang-tag tag-logic">Logic</span>
+                        </div>
+                        <div class="code-body"><span class="cmt">// 1. 변경된 태그 ID 목록 추출</span>
+                            <span class="kwd">const</span> changedTags = [];
+                            v6Annotations.<span class="func">forEach</span>(newTag =&gt; {
+                            <span class="kwd">const</span> oldTag = v5Annotations.<span class="func">find</span>(t =&gt;
+                            t.id === newTag.id);
+
+                            <span class="kwd">if</span> (!oldTag) <span class="kwd">return</span>; <span class="cmt">//
+                                신규 추가는 기존 문제 영향 없음</span>
+                            <span class="cmt">// 속성이 달라졌는지 깊은 비교</span>
+                            <span class="kwd">if</span> (!<span class="func">isEqual</span>(oldTag.attrs, newTag.attrs))
+                            {
+                            changedTags.<span class="func">push</span>(newTag.id); <span class="cmt">// 'bt-002'</span>
+                            }
+                            });
+
+                            <span class="cmt">// 2. 삭제된 태그 ID 추출</span>
+                            v5Annotations.<span class="func">forEach</span>(oldTag =&gt; {
+                            <span class="kwd">if</span> (!v6Annotations.<span class="func">find</span>(t =&gt; t.id ===
+                            oldTag.id)) {
+                            changedTags.<span class="func">push</span>(oldTag.id); <span class="cmt">// 'bt-003'</span>
+                            }
+                            });
+                        </div>
+                    </div>
+                    <!-- Right: SQL Selective Update -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-database text-blue-400"></i> updateStaleStatus.sql
+                            </div>
+                            <span class="lang-tag tag-sql">SQL</span>
+                        </div>
+                        <div class="code-body"><span class="cmt">-- 영향받는 문제 세트만 '선택적'으로 Stale 처리</span>
+                            <span class="sql-kwd">UPDATE</span> quiz_sets
+                            <span class="sql-kwd">SET</span> is_stale <span class="sql-op">=</span> <span
+                                class="sql-kwd">true</span>,
+                            stale_reason <span class="sql-op">=</span> <span class="sql-str">'Source annotation
+                                modified/deleted'</span>
+                            <span class="sql-kwd">WHERE</span> source_version_id <span class="sql-op">=</span> <span
+                                class="sql-str">'v5-uuid'</span>
+                            <span class="sql-op">AND</span> id <span class="sql-kwd">IN</span> (
+                            <span class="cmt">-- 변경된 태그('bt-002', 'bt-003')를 사용하는 문제 찾기</span>
+                            <span class="sql-kwd">SELECT</span> <span class="sql-kwd">DISTINCT</span> qq.quiz_set_id
+                            <span class="sql-kwd">FROM</span> quiz_questions qq
+                            <span class="sql-kwd">JOIN</span> document_annotations da
+                            <span class="sql-op">ON</span> qq.source_annotation_id <span class="sql-op">=</span> da.id
+                            <span class="highlight-line"><span class="sql-kwd">WHERE</span> da.mark_id <span
+                                    class="sql-kwd">IN</span> (<span class="sql-str">'bt-002'</span>, <span
+                                    class="sql-str">'bt-003'</span>)</span>
+                            );
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

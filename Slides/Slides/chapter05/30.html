@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 이미지/도표/수식 생성 전략</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Comparison Table Area (Top) */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .db-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 8px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .type-icon {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 0.8rem;
+        }
+
+        .icon-chart {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+
+        .icon-math {
+            background-color: #fce7f3;
+            color: #db2777;
+        }
+
+        .icon-img {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        .icon-table {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        /* 2. Process Flow Area (Middle) */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 10px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 100px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 180px;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-ai {
+            background-color: #8b5cf6;
+        }
+
+        .icon-json-file {
+            background-color: #f59e0b;
+        }
+
+        .icon-render {
+            background-color: #3b82f6;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 20px;
+            top: -12px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 5px;
+        }
+
+        /* 3. Core Principle / Code Area (Bottom) */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1.2;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .principle-panel {
+            flex: 0.8;
+            background-color: #fff7ed;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid #fdba74;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 6px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-json {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">이미지·도표·수식 생성 전략</h1>
+                <p class="subtitle">텍스트가 아닌 콘텐츠의 정확성을 보장하는 하이브리드 접근법</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-layer-group mr-2"></i> Hybrid Rendering
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Comparison Table -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-table text-blue-500"></i> COMPARISON: CONTENT TYPE vs METHOD
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%">콘텐츠 유형</th>
+                                <th style="width: 37%">생성 방법</th>
+                                <th style="width: 20%">도구</th>
+                                <th style="width: 25%">핵심 이유</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="type-icon icon-chart"><i class="fas fa-chart-bar"></i></span> 도표·그래프
+                                </td>
+                                <td>
+                                    <p>AI가 <strong>데이터 JSON</strong> 생성 → 프론트 렌더링</p>
+                                </td>
+                                <td>Chart.js, D3.js</td>
+                                <td><span class="font-bold text-blue-600">정확성 100%</span>, 수치 오류 없음</td>
+                            </tr>
+                            <tr>
+                                <td><span class="type-icon icon-math"><i class="fas fa-square-root-alt"></i></span>
+                                    수식·공식</td>
+                                <td>
+                                    <p>AI가 <strong>LaTeX 코드</strong> 생성 → 프론트 렌더링</p>
+                                </td>
+                                <td>KaTeX, MathJax</td>
+                                <td>수학적 기호의 완벽한 표현</td>
+                            </tr>
+                            <tr>
+                                <td><span class="type-icon icon-img"><i class="fas fa-image"></i></span> 일러스트</td>
+                                <td>
+                                    <p>AI 이미지 생성 + <strong>SVG 라벨 오버레이</strong></p>
+                                </td>
+                                <td>DALL-E 3, Flux</td>
+                                <td>텍스트 뭉개짐(Artifact) 방지</td>
+                            </tr>
+                            <tr>
+                                <td><span class="type-icon icon-table"><i class="fas fa-th"></i></span> 표 (Table)</td>
+                                <td>
+                                    <p>HTML/Markdown 테이블 직접 생성</p>
+                                </td>
+                                <td>TipTap Extension</td>
+                                <td>에디터 내 즉시 수정 가능</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 2. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-project-diagram text-green-600"></i> PROCESS EXAMPLE: GRAPH GENERATION
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-ai">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="step-title">AI Request</div>
+                        <div class="step-desc">"Create a bar chart config..."</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Generates Data Only</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-json-file">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="step-title">JSON Response</div>
+                        <div class="step-desc">Structured Config Data</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Frontend Rendering</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-render">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="step-title">Browser Render</div>
+                        <div class="step-desc">&lt;canvas&gt; with Chart.js</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 3. Core Principle & Code -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-lightbulb text-orange-500"></i> CORE PRINCIPLE &amp; IMPLEMENTATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: Code Example -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-code text-blue-400"></i> AI Output (Data Only)
+                            </div>
+                            <span class="lang-tag tag-json">JSON</span>
+                        </div>
+                        <div class="code-body">{
+                            <span class="prop">"type"</span>: <span class="str">"bar"</span>,
+                            <span class="prop">"data"</span>: {
+                            <span class="prop">"labels"</span>: [<span class="str">"명반응"</span>, <span
+                                class="str">"캘빈회로"</span>],
+                            <span class="prop">"datasets"</span>: [{
+                            <span class="prop">"label"</span>: <span class="str">"에너지 효율 (%)"</span>,
+                            <span class="prop">"data"</span>: [<span class="num">34</span>, <span
+                                class="num">66</span>],
+                            <span class="prop">"backgroundColor"</span>: [<span class="str">"#F59E0B"</span>, <span
+                                class="str">"#10B981"</span>]
+                            }]
+                            }
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: Principle Box -->
+                    <div class="principle-panel">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-exclamation-circle text-4xl text-orange-500 mb-2"></i>
+                            <h3 class="text-xl font-black text-gray-800 font-sans">핵심 원칙</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                                <p class="text-gray-700 text-sm font-bold">AI는 <span
+                                        class="text-blue-600 bg-blue-50 px-1 rounded">데이터(Data)</span>를 만들고,<br />렌더링은
+                                    <span class="text-indigo-600 bg-indigo-50 px-1 rounded">코드(Code)</span>가 한다.</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
+                                <p class="text-gray-600 text-sm">AI 이미지 생성 모델에게<br />텍스트나 복잡한 수치를 맡기지 않는다.<br /><span
+                                        class="text-xs text-red-400">(환각 및 렌더링 오류 위험)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

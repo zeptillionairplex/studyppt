@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>검수 품질 KPI — AI가 얼마나 잘하고 있는가</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 5px 0 0 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* KPI Definition Table */
+        .kpi-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .kpi-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .kpi-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .kpi-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .target-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .target-badge.warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .target-badge.danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Dashboard Area */
+        .dashboard-area {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Left Dashboard: Summary & Progress */
+        .dashboard-left {
+            width: 40%;
+            background: #1e293b;
+            /* Dark theme for dashboard */
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .total-stat {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .total-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            margin-bottom: 15px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background-color: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Right Dashboard: Charts */
+        .dashboard-right {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar-chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            height: 24px;
+        }
+
+        .bar-label {
+            width: 100px;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .bar-track {
+            flex: 1;
+            background-color: #f1f5f9;
+            height: 16px;
+            border-radius: 4px;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .bar-value {
+            height: 100%;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .bar-text {
+            width: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #334155;
+            text-align: right;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">검수 품질 KPI — AI가 얼마나 잘하고 있는가</h1>
+                <p class="subtitle">프롬프트 품질 및 운영 효율성을 측정하는 핵심 지표</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-chart-line mr-1"></i> Data Analytics
+                </span>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- KPI Definition Table -->
+            <div class="kpi-table-container">
+                <table class="kpi-table">
+                    <thead>
+                        <tr>
+                            <th width="20%">지표 (Metric)</th>
+                            <th width="30%">계산 방법</th>
+                            <th width="15%">목표 (Target)</th>
+                            <th width="35%">의미 및 중요성</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-blue-700">1차 통과율 (First-pass Rate)</td>
+                            <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">수정없이 approved / 전체
+                                    생성</span></td>
+                            <td><span class="target-badge">80% 이상</span></td>
+                            <td>
+                                <p>AI 생성 품질의 핵심 지표. 이 수치가 높아야 선생님의 검수 부담이 줄어듦.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-yellow-700">수정 후 통과율</td>
+                            <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">ai_then_manual / 전체
+                                    생성</span></td>
+                            <td><span class="target-badge warning">15% 이하</span></td>
+                            <td>
+                                <p>AI가 생성했지만 사람이 손을 댄 비율. 높으면 프롬프트 개선이 필요함.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-red-700">반려율 (Rejection Rate)</td>
+                            <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">rejected / 전체 생성</span>
+                            </td>
+                            <td><span class="target-badge danger">5% 이하</span></td>
+                            <td>
+                                <p>아예 못 쓸 문제의 비율. 빈번하면 AI 모델이나 원문에 근본적 문제가 있음.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-gray-700">평균 재생성 횟수</td>
+                            <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">총 attempt 수 / 문제 수</span>
+                            </td>
+                            <td><span class="target-badge">1.1회 이하</span></td>
+                            <td>
+                                <p>문제 하나를 건지기 위해 AI를 몇 번 호출했는가 (비용 효율성).</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Dashboard Area -->
+            <div class="dashboard-area">
+                <!-- Left: Overall Stats -->
+                <div class="dashboard-left">
+                    <div class="dashboard-title">
+                        <span><i class="fas fa-database mr-2"></i>OVERALL STATUS (30 Days)</span>
+                        <span class="text-xs bg-gray-700 px-2 py-1 rounded">Live Data</span>
+                    </div>
+                    <div class="total-stat">1,247</div>
+                    <div class="total-label">Total Questions Generated</div>
+                    <!-- Progress Bars -->
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="text-green-400 font-bold"><i class="fas fa-check-circle mr-2"></i>1차 통과
+                                (Pass)</span>
+                            <span>1,023 (82.0%)</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill bg-green-500" style="width: 82%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="text-yellow-400 font-bold"><i class="fas fa-pencil-alt mr-2"></i>수정 후 승인
+                                (Edited)</span>
+                            <span>156 (12.5%)</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill bg-yellow-500" style="width: 12.5%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="text-blue-400 font-bold"><i class="fas fa-sync-alt mr-2"></i>재생성 후 승인
+                                (Retry)</span>
+                            <span>43 (3.4%)</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill bg-blue-500" style="width: 3.4%;"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item mb-0">
+                        <div class="progress-header">
+                            <span class="text-red-400 font-bold"><i class="fas fa-times-circle mr-2"></i>최종 반려
+                                (Rejected)</span>
+                            <span>25 (2.0%)</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill bg-red-500" style="width: 2.0%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right: Detailed Charts -->
+                <div class="dashboard-right">
+                    <!-- Model Performance -->
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <i class="fas fa-robot text-indigo-500"></i>
+                            모델별 1차 통과율 비교
+                        </div>
+                        <!-- Chart 1 -->
+                        <div class="bar-chart-row">
+                            <div class="bar-label">Claude Sonnet</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-indigo-500" style="width: 91.2%;"></div>
+                            </div>
+                            <div class="bar-text text-indigo-600">91.2%</div>
+                        </div>
+                        <div class="bar-chart-row">
+                            <div class="bar-label">Gemini Flash</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-blue-400" style="width: 79.3%;"></div>
+                            </div>
+                            <div class="bar-text text-blue-500">79.3%</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-2 text-right">
+                            * Claude Sonnet이 품질은 좋으나 비용이 높음
+                        </div>
+                    </div>
+                    <!-- Type Performance -->
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <i class="fas fa-shapes text-orange-500"></i>
+                            문제 유형별 1차 통과율
+                        </div>
+                        <!-- Chart 2 -->
+                        <div class="bar-chart-row">
+                            <div class="bar-label">빈칸 채우기</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-green-500" style="width: 92.1%;"></div>
+                            </div>
+                            <div class="bar-text">92.1%</div>
+                        </div>
+                        <div class="bar-chart-row">
+                            <div class="bar-label">True / False</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-green-400" style="width: 88.5%;"></div>
+                            </div>
+                            <div class="bar-text">88.5%</div>
+                        </div>
+                        <div class="bar-chart-row">
+                            <div class="bar-label">단순 MCQ</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-yellow-400" style="width: 81.3%;"></div>
+                            </div>
+                            <div class="bar-text">81.3%</div>
+                        </div>
+                        <div class="bar-chart-row">
+                            <div class="bar-label font-bold text-red-500">응용 MCQ</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-red-400" style="width: 67.4%;">
+                                    <div
+                                        class="absolute right-2 top-0 bottom-0 flex items-center text-xs text-white font-bold px-1">
+                                        Warning</div>
+                                </div>
+                            </div>
+                            <div class="bar-text text-red-600">67.4%</div>
+                        </div>
+                        <div class="bar-chart-row">
+                            <div class="bar-label">서술형</div>
+                            <div class="bar-track">
+                                <div class="bar-value bg-yellow-500" style="width: 72.8%;"></div>
+                            </div>
+                            <div class="bar-text">72.8%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

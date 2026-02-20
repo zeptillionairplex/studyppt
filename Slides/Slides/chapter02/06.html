@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 시스템 아키텍처</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-image:
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+            position: relative;
+        }
+
+        /* Overlay to fade out background grid */
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(248, 250, 252, 0.92);
+            z-index: 0;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .architecture-diagram {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            /* Gap between layers */
+            padding: 10px 0;
+        }
+
+        /* Layer Styles */
+        .layer-row {
+            display: flex;
+            align-items: stretch;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            min-height: 90px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .layer-label {
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .layer-label-text {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .layer-label-desc {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .layer-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 15px;
+            background-color: #ffffff;
+        }
+
+        /* Component Box */
+        .comp-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            text-align: center;
+            height: 100%;
+            transition: all 0.2s;
+        }
+
+        .comp-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .comp-icon {
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+
+        .comp-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 2px;
+        }
+
+        .comp-detail {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Specific Layer Colors */
+        /* 1. Client Layer - Blue */
+        .layer-client .layer-label {
+            background-color: #3b82f6;
+        }
+
+        .layer-client .comp-icon {
+            color: #3b82f6;
+        }
+
+        .layer-client .comp-box {
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        /* 2. API Layer - Teal */
+        .layer-api .layer-label {
+            background-color: #0d9488;
+        }
+
+        .layer-api .comp-icon {
+            color: #0d9488;
+        }
+
+        .layer-api .comp-box {
+            border-bottom: 3px solid #0d9488;
+        }
+
+        /* 3. Business Logic - Violet */
+        .layer-biz .layer-label {
+            background-color: #7c3aed;
+        }
+
+        .layer-biz .comp-icon {
+            color: #7c3aed;
+        }
+
+        .layer-biz .comp-box {
+            border-bottom: 3px solid #7c3aed;
+        }
+
+        /* 4. Data Layer - Slate/Gray */
+        .layer-data .layer-label {
+            background-color: #475569;
+        }
+
+        .layer-data .comp-icon {
+            color: #475569;
+        }
+
+        .layer-data .comp-box {
+            border-bottom: 3px solid #475569;
+        }
+
+        /* 5. External - Amber/Orange */
+        .layer-ext .layer-label {
+            background-color: #d97706;
+        }
+
+        .layer-ext .comp-icon {
+            color: #d97706;
+        }
+
+        .layer-ext .comp-box {
+            border-bottom: 3px solid #d97706;
+            border-style: dashed;
+        }
+
+        /* Arrows between layers */
+        .flow-arrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 16px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 0;
+        }
+
+        .flow-arrow::before,
+        .flow-arrow::after {
+            content: '';
+            height: 1px;
+            width: 40px;
+            background-color: #cbd5e1;
+            margin: 0 10px;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            color: #475569;
+            margin-top: 4px;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <div class="bg-overlay"></div>
+        <div class="content-wrapper">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1 class="title">전체 시스템 아키텍처</h1>
+                    <p class="subtitle">5-Tier Layered Architecture Overview</p>
+                </div>
+                <div style="text-align: right; color: #64748b; font-size: 0.9rem;">
+                    <i class="fas fa-layer-group text-blue-600 mr-2"></i>각 레이어는 독립적으로 확장/교체 가능
+                </div>
+            </div>
+            <!-- Architecture Diagram -->
+            <div class="architecture-diagram">
+                <!-- Layer 1: Client -->
+                <div class="layer-row layer-client">
+                    <div class="layer-label">
+                        <span class="layer-label-text">Client Layer</span>
+                        <span class="layer-label-desc">User Interface</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="comp-box">
+                            <i class="fas fa-pen-nib comp-icon"></i>
+                            <p class="comp-title">TipTap Editor</p>
+                            <p class="comp-detail">원문 작성 &amp; 태깅</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-clipboard-check comp-icon"></i>
+                            <p class="comp-title">문제 검수 UI</p>
+                            <p class="comp-detail">Human-in-the-Loop</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-chart-pie comp-icon"></i>
+                            <p class="comp-title">관리자 대시보드</p>
+                            <p class="comp-detail">통계 및 사용자 관리</p>
+                        </div>
+                        <div class="comp-box" style="background-color: #f0f9ff;">
+                            <i class="fas fa-robot comp-icon"></i>
+                            <p class="comp-title">외부 Client</p>
+                            <p class="comp-detail">AI Agent / 3rd Party</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Arrow -->
+                <div class="flow-arrow"><i class="fas fa-chevron-down"></i></div>
+                <!-- Layer 2: API -->
+                <div class="layer-row layer-api">
+                    <div class="layer-label">
+                        <span class="layer-label-text">API Layer</span>
+                        <span class="layer-label-desc">Gateway &amp; Routing</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="comp-box">
+                            <i class="fas fa-file-alt comp-icon"></i>
+                            <p class="comp-title">Document Service</p>
+                            <p class="comp-detail">CRUD / Versioning API</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-question-circle comp-icon"></i>
+                            <p class="comp-title">Quiz Service</p>
+                            <p class="comp-detail">문제 생성 및 관리 API</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-file-export comp-icon"></i>
+                            <p class="comp-title">Export / Import</p>
+                            <p class="comp-detail">PDF, JSON 변환</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-lock comp-icon"></i>
+                            <p class="comp-title">Public API</p>
+                            <p class="comp-detail">REST + JWT Auth</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Arrow -->
+                <div class="flow-arrow"><i class="fas fa-chevron-down"></i></div>
+                <!-- Layer 3: Business Logic -->
+                <div class="layer-row layer-biz">
+                    <div class="layer-label">
+                        <span class="layer-label-text">Business Logic</span>
+                        <span class="layer-label-desc">Core Domain</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="comp-box">
+                            <i class="fas fa-code-branch comp-icon"></i>
+                            <p class="comp-title">Version Control</p>
+                            <span class="tech-badge">Git-like System</span>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-random comp-icon"></i>
+                            <p class="comp-title">AI Router</p>
+                            <span class="tech-badge">Model Switching</span>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-tags comp-icon"></i>
+                            <p class="comp-title">Annotation Parser</p>
+                            <span class="tech-badge">Mark Extractor</span>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-bell comp-icon"></i>
+                            <p class="comp-title">Notification Engine</p>
+                            <span class="tech-badge">Stale Updates</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Arrow -->
+                <div class="flow-arrow"><i class="fas fa-chevron-down"></i></div>
+                <!-- Layer 4: Data -->
+                <div class="layer-row layer-data">
+                    <div class="layer-label">
+                        <span class="layer-label-text">Data Layer</span>
+                        <span class="layer-label-desc">Persistence</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="comp-box">
+                            <i class="fas fa-database comp-icon"></i>
+                            <p class="comp-title">PostgreSQL</p>
+                            <p class="comp-detail">Main DB (JSONB)</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-bolt comp-icon"></i>
+                            <p class="comp-title">Redis</p>
+                            <p class="comp-detail">Cache &amp; Session</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-cloud comp-icon"></i>
+                            <p class="comp-title">S3 / R2</p>
+                            <p class="comp-detail">Object Storage</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-tasks comp-icon"></i>
+                            <p class="comp-title">BullMQ</p>
+                            <p class="comp-detail">Async Job Queue</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Arrow -->
+                <div class="flow-arrow"><i class="fas fa-chevron-down"></i></div>
+                <!-- Layer 5: External Services -->
+                <div class="layer-row layer-ext">
+                    <div class="layer-label">
+                        <span class="layer-label-text">External Layer</span>
+                        <span class="layer-label-desc">3rd Party APIs</span>
+                    </div>
+                    <div class="layer-content">
+                        <div class="comp-box">
+                            <i class="fas fa-bolt comp-icon"></i>
+                            <p class="comp-title">Gemini Flash</p>
+                            <p class="comp-detail">Basic Model (Fast)</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-brain comp-icon"></i>
+                            <p class="comp-title">Claude Sonnet</p>
+                            <p class="comp-detail">Advanced Model</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-robot comp-icon"></i>
+                            <p class="comp-title">OpenAI GPT-4o</p>
+                            <p class="comp-detail">Fallback Option</p>
+                        </div>
+                        <div class="comp-box">
+                            <i class="fas fa-image comp-icon"></i>
+                            <p class="comp-title">Image Gen AI</p>
+                            <p class="comp-detail">DALL-E / Flux</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 런칭 전 법적 체크리스트</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Reduced gap to fit content */
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area - Modified for Launch Gate */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 110px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 200px;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .icon-dev {
+            background-color: #64748b;
+        }
+
+        .icon-check {
+            background-color: #f59e0b;
+        }
+
+        .icon-legal {
+            background-color: #ef4444;
+        }
+
+        .icon-launch {
+            background-color: #10b981;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 15px;
+            top: -15px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        /* 2. Checklist Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            flex: 1;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Sans KR', sans-serif;
+            /* Changed to Sans for checklist readability */
+            font-size: 0.8rem;
+        }
+
+        .db-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .tag-category-a {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .tag-category-b {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .tag-category-c {
+            background-color: #fce7f3;
+            color: #be185d;
+        }
+
+        .tag-category-d {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .check-box {
+            color: #cbd5e1;
+            margin-right: 8px;
+        }
+
+        .check-box.checked {
+            color: #10b981;
+        }
+
+        /* 3. Code/Info Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            height: 160px;
+            /* Fixed height for bottom section */
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 6px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .tag-json {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 12px 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .bool {
+            color: #d19a66;
+            font-weight: bold;
+        }
+
+        .important-alert {
+            color: #fca5a5;
+            font-weight: bold;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">런칭 전 법적 체크리스트 — A/B/C/D 필수 점검</h1>
+                <p class="subtitle">서비스 런칭을 위한 최종 관문: 시스템 구현과 법적 안전장치의 동기화</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-gavel mr-2"></i> Legal Review Required
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Flow Diagram -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-map-signs text-blue-500"></i> LAUNCH GATEWAY PROCESS
+                </div>
+                <div class="flow-area">
+                    <div class="flow-step">
+                        <div class="step-icon icon-dev"><i class="fas fa-code"></i></div>
+                        <div class="step-title">1. 기능 구현</div>
+                        <div class="step-desc">시스템 개발 완료</div>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-step">
+                        <div class="step-icon icon-check"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="step-title">2. 내부 점검</div>
+                        <div class="step-desc">A/B/C/D 항목 체크</div>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-step">
+                        <div class="step-icon icon-legal"><i class="fas fa-stamp"></i></div>
+                        <div class="step-title">3. 변호사 검토</div>
+                        <div class="step-desc" style="color:#ef4444; font-weight:bold;">약관/정책 최종 승인</div>
+                    </div>
+                    <div class="flow-arrow"></div>
+                    <div class="flow-step">
+                        <div class="step-icon icon-launch"><i class="fas fa-rocket"></i></div>
+                        <div class="step-title">4. 서비스 런칭</div>
+                        <div class="step-desc">최종 배포</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Checklist Table -->
+            <div style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                <div class="section-label">
+                    <i class="fas fa-list-ol text-green-600"></i> PRE-LAUNCH CHECKLIST
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">Category</th>
+                                <th style="width: 65%">Check Items</th>
+                                <th style="width: 20%">System Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="tag-badge tag-category-a">A. 마켓/겸직</span></td>
+                                <td>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 현직 교원 유료 판매 차단
+                                        및 겸직허가서 검증 로직 구현</p>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 약관 내
+                                        '통신판매중개업자' 지위 및 '겸직 책임' 명시</p>
+                                    <p class="my-1"><i class="fas fa-square check-box"></i> 관할 구청 통신판매중개업 신고 완료</p>
+                                </td>
+                                <td><span class="text-blue-600 font-bold">In Progress</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-category-b">B. 개인정보</span></td>
+                                <td>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 만 14세 미만 가입 시
+                                        법정대리인(학부모) 동의 프로세스</p>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 탈퇴 시 개인정보 즉시
+                                        파기 및 학습 데이터 익명화</p>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 개인정보 처리방침
+                                        (수집항목, 보유기간, 위탁내역) 작성</p>
+                                </td>
+                                <td><span class="text-green-600 font-bold">Ready</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-category-c">C. AI 데이터</span></td>
+                                <td>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> AI 프롬프트 전송 시
+                                        개인 식별 정보(PII) 제거 검증</p>
+                                    <p class="my-1"><i class="fas fa-square check-box"></i> AI 제조사(Anthropic/OpenAI)와
+                                        DPA(데이터 처리 계약) 체결</p>
+                                </td>
+                                <td><span class="text-yellow-600 font-bold">Reviewing</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="tag-badge tag-category-d">D. 기타</span></td>
+                                <td>
+                                    <p class="my-1"><i class="fas fa-check-square check-box checked"></i> 전자상거래법 준수 환불
+                                        정책 및 청소년 보호 정책 수립</p>
+                                </td>
+                                <td><span class="text-green-600 font-bold">Ready</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code/Info Block -->
+            <div style="height: 160px; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-shield-alt text-indigo-500"></i> ENFORCEMENT &amp; COST ESTIMATION
+                </div>
+                <div class="code-container">
+                    <!-- Left: Logic Enforcement -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> launch_validator.ts
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">async function</span> <span
+                                class="func">validateLaunchReadiness</span>() {
+                            <span class="kwd">const</span> checks = <span class="kwd">await</span> System.<span
+                                class="func">getLegalStatus</span>();
+
+                            <span class="cmt">// 1. 변호사 검토 완료 여부 확인 (필수)</span>
+                            <span class="kwd">if</span> (!checks.<span class="prop">terms_reviewed_by_lawyer</span>) {
+                            <span class="kwd">throw new</span> <span class="func">Error</span>(<span
+                                class="str">"CRITICAL: 약관 법률 검토가 완료되지 않았습니다."</span>);
+                            }
+
+                            <span class="cmt">// 2. 개인정보 처리방침 게시 확인</span>
+                            <span class="kwd">if</span> (!checks.<span class="prop">privacy_policy_published</span>) {
+                            <span class="kwd">throw new</span> <span class="func">Error</span>(<span class="str">"개인정보
+                                처리방침이 게시되지 않았습니다."</span>);
+                            }
+
+                            <span class="kwd">return</span> <span class="bool">true</span>; <span class="cmt">// Ready
+                                to Launch 🚀</span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: Budget & Action -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-invoice-dollar text-yellow-400"></i> legal_review_budget.json
+                            </div>
+                            <span class="lang-tag tag-json">JSON</span>
+                        </div>
+                        <div class="code-body">{
+                            <span class="prop">"action_item"</span>: <span class="str">"교육법 전문 변호사 약관 검토"</span>,
+                            <span class="prop">"necessity"</span>: <span class="str">"MANDATORY (법적 면책 필수)"</span>,
+                            <span class="prop">"estimated_cost"</span>: {
+                            <span class="prop">"simple_review"</span>: <span class="str">"1,000,000 KRW"</span>,
+                            <span class="prop">"full_drafting"</span>: <span class="str">"3,000,000 ~ 5,000,000
+                                KRW"</span>
+                            },
+                            <span class="prop">"timeline"</span>: <span class="str">"런칭 4주 전 의뢰 (소요기간 2주)"</span>,
+                            <span class="prop">"risk_if_skipped"</span>: [
+                            <span class="str">"서비스 운영 정지"</span>,
+                            <span class="str">"교원 징계 책임 연대"</span>,
+                            <span class="important-alert">"개인정보보호법 위반 과태료"</span>
+                            ]
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

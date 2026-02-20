@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 전체 파이프라인</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@500&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Layout */
+        .content-area {
+            display: flex;
+            gap: 40px;
+            flex: 1;
+            height: 100%;
+        }
+
+        .main-pipeline {
+            flex: 2.2;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .side-flow {
+            flex: 0.8;
+            background-color: #f0f9ff;
+            /* Light Blue 50 */
+            border: 2px dashed #3b82f6;
+            /* Blue 500 */
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .section-label {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Pipeline Steps */
+        .pipeline-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            height: 110px;
+        }
+
+        .step-num {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .step-icon {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .step-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+            line-height: 1.3;
+            margin: 0;
+            flex: 1;
+        }
+
+        .tech-tag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 2px 6px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        /* Step Colors - Pipeline Stages */
+        /* 1. Source - Blue */
+        .step-1 {
+            border-left-color: #3b82f6;
+        }
+
+        .step-1 .step-icon {
+            background-color: #3b82f6;
+        }
+
+        /* 2. Generation - Indigo */
+        .step-2 {
+            border-left-color: #6366f1;
+        }
+
+        .step-2 .step-icon {
+            background-color: #6366f1;
+        }
+
+        /* 3. Review - Violet */
+        .step-3 {
+            border-left-color: #8b5cf6;
+        }
+
+        .step-3 .step-icon {
+            background-color: #8b5cf6;
+        }
+
+        /* 4. Delivery - Pink */
+        .step-4 {
+            border-left-color: #ec4899;
+        }
+
+        .step-4 .step-icon {
+            background-color: #ec4899;
+        }
+
+        /* 5. Personalization - Emerald */
+        .step-5 {
+            border-left-color: #10b981;
+        }
+
+        .step-5 .step-icon {
+            background-color: #10b981;
+        }
+
+        /* 6. Feedback - Teal */
+        .step-6 {
+            border-left-color: #0d9488;
+        }
+
+        .step-6 .step-icon {
+            background-color: #0d9488;
+        }
+
+        /* 7. Cache Hit - Amber (Special) */
+        .step-cache {
+            border-left-color: #f59e0b;
+        }
+
+        .step-cache .step-icon {
+            background-color: #f59e0b;
+        }
+
+        /* 8. AI Call - Rose (Special) */
+        .step-ai {
+            border-left-color: #f43f5e;
+        }
+
+        .step-ai .step-icon {
+            background-color: #f43f5e;
+        }
+
+        /* Flow Indicators */
+        .arrow-right {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 1.5rem;
+            z-index: 0;
+        }
+
+        .arrow-down-container {
+            display: flex;
+            justify-content: center;
+            height: 20px;
+            align-items: center;
+            color: #cbd5e1;
+        }
+
+        /* Side Flow (Principles) */
+        .side-title {
+            color: #1e40af;
+            /* Blue 800 */
+        }
+
+        .principle-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .principle-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .principle-icon {
+            color: #3b82f6;
+            font-size: 1.1rem;
+        }
+
+        .principle-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin: 0;
+        }
+
+        .principle-desc {
+            font-size: 0.8rem;
+            color: #475569;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .highlight-badge {
+            display: inline-block;
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* Custom Connector Lines */
+        .connector-vertical {
+            width: 2px;
+            background-color: #cbd5e1;
+            margin: 0 auto;
+            height: 15px;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">문제 생성 → 검수 → 학생 제공</h1>
+                <p class="subtitle">Human-in-the-Loop 전체 파이프라인 요약</p>
+            </div>
+            <div style="text-align: right; color: #64748b; font-size: 0.9rem;">
+                <p><i class="fas fa-project-diagram text-blue-600 mr-2"></i>End-to-End Workflow</p>
+            </div>
+        </div>
+        <div class="content-area">
+            <!-- Main Pipeline (Left) -->
+            <div class="main-pipeline">
+                <div class="section-label text-blue-800">
+                    <i class="fas fa-stream"></i> Core Pipeline
+                </div>
+                <!-- Row 1: Source & Trigger -->
+                <div class="pipeline-container">
+                    <!-- Step 1 -->
+                    <div class="step-card step-1">
+                        <div class="step-num">01</div>
+                        <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                        <h3 class="step-title">원문 저장 (태그 포함)</h3>
+                        <p class="step-desc">선생님이 TipTap 에디터로 원문 작성 및 핵심 용어 태깅</p>
+                        <span class="tech-tag">Document Versioning</span>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="step-card step-2">
+                        <div class="step-num">02</div>
+                        <div class="step-icon"><i class="fas fa-robot"></i></div>
+                        <h3 class="step-title">AI 생성 요청</h3>
+                        <p class="step-desc">"문제 생성" 클릭 → Annotation 추출 → AI Router 모델 선택</p>
+                        <span class="tech-tag">Parser &amp; LLM Router</span>
+                    </div>
+                </div>
+                <div class="arrow-down-container"><i class="fas fa-chevron-down"></i></div>
+                <!-- Row 2: Generation Branch -->
+                <div class="pipeline-container">
+                    <!-- Step 3A (Cache) -->
+                    <div class="step-card step-cache">
+                        <div class="step-num">3A</div>
+                        <div class="step-icon"><i class="fas fa-bolt"></i></div>
+                        <h3 class="step-title">캐시 히트 (Fast Path)</h3>
+                        <p class="step-desc">동일 조건 요청 시 Redis/DB에서 이전 결과 즉시 반환 ($0)</p>
+                        <span class="tech-tag">Redis Cache</span>
+                    </div>
+                    <!-- Step 3B (AI) -->
+                    <div class="step-card step-ai">
+                        <div class="step-num">3B</div>
+                        <div class="step-icon"><i class="fas fa-brain"></i></div>
+                        <h3 class="step-title">AI 호출 (Slow Path)</h3>
+                        <p class="step-desc">캐시 미스 시 외부 API 호출 → 응답 파싱 → Draft 저장</p>
+                        <span class="tech-tag">Gemini / Claude</span>
+                    </div>
+                </div>
+                <div class="arrow-down-container"><i class="fas fa-chevron-down"></i></div>
+                <!-- Row 3: Review & Publish -->
+                <div class="pipeline-container">
+                    <!-- Step 4 -->
+                    <div class="step-card step-3">
+                        <div class="step-num">04</div>
+                        <div class="step-icon"><i class="fas fa-tasks"></i></div>
+                        <h3 class="step-title">검수 (Human-in-the-Loop)</h3>
+                        <p class="step-desc">승인(Approved), 수정(Edit), 재생성(Regen), 반려(Reject)</p>
+                        <span class="tech-tag">Teacher Dashboard</span>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="step-card step-4">
+                        <div class="step-num">05</div>
+                        <div class="step-icon"><i class="fas fa-school"></i></div>
+                        <h3 class="step-title">학생 문제은행 배포</h3>
+                        <p class="step-desc">Status='Approved' 문제만 학생에게 노출 및 풀이 가능</p>
+                        <span class="tech-tag">Publish Guard</span>
+                    </div>
+                </div>
+                <div class="arrow-down-container"><i class="fas fa-chevron-down"></i></div>
+                <!-- Row 4: Adaptive & Feedback -->
+                <div class="pipeline-container">
+                    <!-- Step 6 -->
+                    <div class="step-card step-5">
+                        <div class="step-num">06</div>
+                        <div class="step-icon"><i class="fas fa-sliders-h"></i></div>
+                        <h3 class="step-title">개인화 맞춤 출제</h3>
+                        <p class="step-desc">Elo 레이팅 + BKT 모델로 학생 수준에 맞는 문제 선별</p>
+                        <span class="tech-tag">Adaptive Engine</span>
+                    </div>
+                    <!-- Step 7 -->
+                    <div class="step-card step-6">
+                        <div class="step-num">07</div>
+                        <div class="step-icon"><i class="fas fa-chart-pie"></i></div>
+                        <h3 class="step-title">결과 반영 및 학습</h3>
+                        <p class="step-desc">풀이 데이터 수집 → 학생 실력 &amp; 문제 난이도 업데이트</p>
+                        <span class="tech-tag">Feedback Loop</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Side Flow (Principles) -->
+            <div class="side-flow">
+                <div class="section-label side-title">
+                    <i class="fas fa-star"></i> 3가지 핵심 원칙
+                </div>
+                <!-- Principle 1 -->
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <i class="fas fa-shield-alt principle-icon"></i>
+                        <h4 class="principle-title">안전한 배포 원칙</h4>
+                    </div>
+                    <p class="principle-desc">"APPROVED가 아니면 학생에게 절대 도달하지 않는다."</p>
+                    <span class="highlight-badge">WHERE status = 'approved'</span>
+                </div>
+                <!-- Principle 2 -->
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <i class="fas fa-file-contract principle-icon"></i>
+                        <h4 class="principle-title">투명한 기록 원칙</h4>
+                    </div>
+                    <p class="principle-desc">"모든 AI 호출은 상세히 기록된다 (모델, 토큰, 비용, 원문)."</p>
+                    <span class="highlight-badge">Audit Log Tracking</span>
+                </div>
+                <!-- Principle 3 -->
+                <div class="principle-card">
+                    <div class="principle-header">
+                        <i class="fas fa-user-edit principle-icon"></i>
+                        <h4 class="principle-title">교사 주권 원칙</h4>
+                    </div>
+                    <p class="principle-desc">"선생님은 언제든 직접 개입하여 AI 결과를 수정할 수 있다."</p>
+                    <span class="highlight-badge">Manual Override</span>
+                </div>
+                <!-- Summary Box -->
+                <div
+                    style="margin-top: auto; background-color: white; padding: 15px; border-radius: 10px; border: 1px solid #bfdbfe;">
+                    <h4 style="margin: 0 0 5px 0; color: #1e40af; font-size: 0.9rem; font-weight: 700;"><i
+                            class="fas fa-check-circle mr-2"></i>최종 목표</h4>
+                    <p style="margin: 0; font-size: 0.8rem; color: #475569;">AI의 <strong>생산성</strong>과 교사의
+                        <strong>전문성</strong>을 결합하여, 최고 품질의 개인화 학습 콘텐츠를 제공합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

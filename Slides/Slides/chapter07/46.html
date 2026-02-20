@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>EduContent CMS - 재생성 흐름</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Black+Han+Sans&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1280px;
+            height: 720px;
+            background-color: #f8fafc;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            display: flex;
+            flex-direction: column;
+            width: 1280px;
+            height: 720px;
+            padding: 30px 50px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 3px solid #ec4899;
+            /* Pink-500 for Loop/Feedback theme */
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-family: 'Black Han Sans', sans-serif;
+            font-size: 2.2rem;
+            color: #831843;
+            /* Pink-900 */
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Section Containers */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 1. Flow Diagram Area */
+        .flow-area {
+            background: white;
+            border-radius: 12px;
+            padding: 10px 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            height: 110px;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 140px;
+        }
+
+        .step-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon-reject {
+            background-color: #ef4444;
+        }
+
+        /* Red */
+        .icon-context {
+            background-color: #8b5cf6;
+        }
+
+        /* Violet */
+        .icon-ai {
+            background-color: #f59e0b;
+        }
+
+        /* Amber */
+        .icon-review {
+            background-color: #10b981;
+        }
+
+        /* Emerald */
+
+        .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+        }
+
+        .step-desc {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        .flow-arrow {
+            flex: 1;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+            margin: 0 15px;
+            top: -12px;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #cbd5e1;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .arrow-label {
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 600;
+            background: white;
+            padding: 0 4px;
+            white-space: nowrap;
+        }
+
+        /* 2. Sample Table Area */
+        .table-area {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .db-table th {
+            background-color: #fdf2f8;
+            /* Pink-50 */
+            color: #831843;
+            padding: 8px 15px;
+            text-align: left;
+            border-bottom: 2px solid #fbcfe8;
+            font-weight: 700;
+        }
+
+        .db-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .db-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-approved {
+            background-color: #d1fae5;
+            color: #047857;
+        }
+
+        /* 3. Code Area */
+        .code-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .code-panel {
+            flex: 1;
+            background-color: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            background-color: #0f172a;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .panel-label {
+            color: #cbd5e1;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .lang-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .tag-ts {
+            background-color: #3178c6;
+            color: white;
+        }
+
+        .tag-prompt {
+            background-color: #a855f7;
+            color: white;
+        }
+
+        .code-body {
+            flex: 1;
+            padding: 15px;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        /* Syntax Highlight */
+        .kwd {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        .func {
+            color: #61afef;
+        }
+
+        .str {
+            color: #98c379;
+        }
+
+        .num {
+            color: #d19a66;
+        }
+
+        .cmt {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        .prop {
+            color: #e06c75;
+        }
+
+        .type {
+            color: #e5c07b;
+        }
+
+        .p-key {
+            color: #e06c75;
+            font-weight: bold;
+        }
+
+        .p-val {
+            color: #98c379;
+        }
+
+        .highlight-line {
+            background-color: rgba(236, 72, 153, 0.15);
+            /* Pink highlight */
+            display: block;
+            margin: 0 -15px;
+            padding: 0 15px;
+            border-left: 3px solid #ec4899;
+        }
+    </style>
+
+<style>
+    /* COMPACT MODE OVERRIDE */
+    .slide-container { padding: 20px 30px !important; }
+    .header { margin-bottom: 10px !important; padding-bottom: 5px !important; }
+    .title { font-size: 1.8rem !important; }
+    .subtitle { font-size: 1rem !important; }
+    .content-wrapper { padding-top: 5px !important; }
+    
+    /* Table Compactness */
+    .decision-table th, .decision-table td { padding: 6px 10px !important; font-size: 0.8rem !important; }
+    .decision-table th { padding: 8px !important; }
+    .step-icon { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+    
+    /* General Text Compactness */
+    p, li, .step-desc, .side-text { font-size: 0.85rem !important; line-height: 1.4 !important; }
+    h1, h2, h3 { margin-bottom: 4px !important; }
+    .section-label { margin-bottom: 6px !important; font-size: 0.8rem !important; }
+    
+    /* Box Compactness */
+    .step-card, .framework-area, .flow-area { padding: 10px !important; min-height: 0 !important; height: auto !important; }
+    .badge { padding: 0.4rem 0.8rem !important; font-size: 0.85rem !important; }
+    .quote-box { padding: 1.5rem !important; }
+    .quote-text { font-size: 1.3rem !important; }
+</style>
+</head>
+
+<body>
+    <div class="slide-container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1 class="title">반려 → 재생성 — 피드백 루프</h1>
+                <p class="subtitle">선생님의 피드백을 프롬프트에 주입하여 AI가 스스로 개선하는 과정</p>
+            </div>
+            <div class="text-right">
+                <div
+                    class="inline-flex items-center px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-bold">
+                    <i class="fas fa-undo-alt mr-2"></i> Iterative Refinement
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 1. Process Flow -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-random text-pink-500"></i> REGENERATION FLOW
+                </div>
+                <div class="flow-area">
+                    <!-- Step 1 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-reject">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <div class="step-title">1. 반려 (Reject)</div>
+                        <div class="step-desc">사유 및 추가 지시 입력</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Feedback Input</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-context">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="step-title">2. 컨텍스트 구성</div>
+                        <div class="step-desc">원문 + 사유 + 이전 결과</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Inject Context</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-ai">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="step-title">3. AI 재생성</div>
+                        <div class="step-desc">개선된 Draft 생성</div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="flow-arrow">
+                        <div class="arrow-label">Attempt +1</div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="flow-step">
+                        <div class="step-icon icon-review">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="step-title">4. 재검수</div>
+                        <div class="step-desc">승인 또는 재반려 (Max 3)</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. Table Sample -->
+            <div>
+                <div class="section-label">
+                    <i class="fas fa-history text-purple-600"></i> HISTORY: question_generation_log
+                </div>
+                <div class="table-area">
+                    <table class="db-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Attempt</th>
+                                <th style="width: 20%">Model Used</th>
+                                <th style="width: 50%">Feedback (Additional Instruction)</th>
+                                <th style="width: 20%">Result Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="text-gray-500 font-bold">#1</span></td>
+                                <td>gemini-2.5-flash</td>
+                                <td><span class="text-gray-400 italic">(Initial Generation)</span></td>
+                                <td><span class="status-badge status-rejected">REJECTED</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="text-gray-900 font-bold">#2</span></td>
+                                <td>gemini-2.5-flash</td>
+                                <td><span class="text-gray-700">"오답 선택지가 너무 모호함. 정답과 확실히 구분되게 수정."</span></td>
+                                <td><span class="status-badge status-approved">APPROVED</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 3. Code Implementation -->
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                <div class="section-label">
+                    <i class="fas fa-code text-indigo-500"></i> IMPLEMENTATION: lib/quiz-regenerate.ts
+                </div>
+                <div class="code-container">
+                    <!-- Left: TypeScript Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-file-code text-blue-400"></i> regenerateQuestion()
+                            </div>
+                            <span class="lang-tag tag-ts">TS</span>
+                        </div>
+                        <div class="code-body"><span class="kwd">async function</span> <span
+                                class="func">regenerateQuestion</span>(
+                            origin: <span class="type">QuizQuestion</span>,
+                            reason: <span class="type">string</span>,
+                            instruction: <span class="type">string</span>
+                            ) {
+                            <span class="cmt">// 1. 피드백 컨텍스트 구성 (이전 실패 요인 주입)</span>
+                            <span class="kwd">const</span> feedbackContext = <span class="str">`</span>
+                            <span class="str">## 이전 시도 피드백</span>
+                            <span class="str">- 반려 사유: ${reason}</span>
+                            <span class="str">- 추가 지시: ${instruction}</span>
+                            <span class="str">이전 문제 JSON: ${JSON.stringify(origin)}</span>
+                            <span class="str">위 피드백을 반영하여 개선된 문제를 생성하시오.`</span>;
+
+                            <span class="cmt">// 2. AI 재호출 (Attempt 증가)</span>
+                            <span class="kwd">const</span> result = <span class="kwd">await</span> <span
+                                class="func">generateQuiz</span>(
+                            SYSTEM_PROMPT,
+                            <span class="highlight-line"><span class="func">buildUserMessage</span>(origin.source) +
+                                feedbackContext,</span>
+                            origin.questionType
+                            );
+
+                            <span class="cmt">// 3. 로그 기록 및 반환...</span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Right: Prompt Logic -->
+                    <div class="code-panel">
+                        <div class="panel-header">
+                            <div class="panel-label">
+                                <i class="fas fa-terminal text-purple-400"></i> Injected Context Example
+                            </div>
+                            <span class="lang-tag tag-prompt">PROMPT</span>
+                        </div>
+                        <div class="code-body"><span class="cmt"># System: You are an expert exam question
+                                generator...</span>
+                            <span class="cmt"># User Input (Combined):</span>
+                            <span class="p-key">[Source Text]</span>
+                            <span class="p-val">"광합성은 빛에너지를 화학에너지로 전환하는 과정이다..."</span>
+                            <span class="highlight-line"><span class="p-key">[Previous Attempt Feedback]</span></span>
+                            <span class="highlight-line"><span class="p-val">The previous question was rejected
+                                    because:</span></span>
+                            <span class="highlight-line"><span class="p-val">"Distractor options are too similar to the
+                                    answer."</span></span>
+                            <span class="highlight-line"><span class="p-val">Please ensure distinct differences in
+                                    options.</span></span>
+                            <span class="p-key">[Task]</span>
+                            <span class="p-val">Generate a new multiple-choice question based on Source Text,</span>
+                            <span class="p-val">FIXING the issues mentioned in Feedback.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
